@@ -91,14 +91,15 @@ set tabstop=2
 set cindent
 
 " turn off auto-wrap in all cases.
-set tw=0
+" let's see what happens with below formatoptions
+" set tw=0
 
 " show matching enclosing chars for .1 sec
 set showmatch
 set matchtime=1
 
-" don't add linebreaks when wrapping
-set formatoptions=l
+set formatoptions-=t
+set formatoptions+=lcro
 
 " context while scrolling
 set scrolloff=3
@@ -190,12 +191,12 @@ function ToggleColumns()
     set foldcolumn=0
     let s:showbreaktmp = &showbreak
     set showbreak=
-		set nolist
+		"set nolist
   else
     set number
     set foldcolumn=2
     let &showbreak = s:showbreaktmp
-		set list
+		"set list
   end
 endfunction
 "}}}
@@ -275,6 +276,8 @@ if version >= 700
 		map <buffer> ,- mz^r-f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
 		" mark item as = (in [p]rogress)
 		map <buffer> ,p mz^r=f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
+		" mark item as [o]
+		map <buffer> ,o mz^rof[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
 		" mark item with a rank
 		map <buffer> ,1 mz^r1f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
 		map <buffer> ,2 mz^r2f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
