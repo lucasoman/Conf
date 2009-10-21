@@ -1,0 +1,5 @@
+# automatic detach on disconnect
+autodetach on
+
+# status line
+hardstatus alwayslastline "%{= Kw}%-w%{= KB}%50>%n %t%{= Kw}%+w %=%c"
