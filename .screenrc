@@ -2,4 +2,7 @@
 autodetach on
 
 # status line
-hardstatus alwayslastline "%{= Kw}%-w%{= KB}%50>%n %t%{= Kw}%+w %=%c"
+hardstatus alwayslastline "%{= Kw}%-w%{= KB}%50>%n %t%{= Kw}%+w %="
+
+# caption line always on
+caption always "%{=Kw}%n %t - [%H] [%l] %=| %Y-%m-%d %c "
