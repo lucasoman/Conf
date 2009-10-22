@@ -14,6 +14,7 @@ set ttyfast
 " {{{ interface
 " lines, cols in status line
 set ruler
+set rulerformat=%=%h%m%r%w\ %(%c%V%),%l/%L\ %P
 
 " a - terse messages (like [+] instead of [Modified]
 " t - truncate file names
@@ -56,6 +57,9 @@ set hlsearch
 set cursorline
 set cursorcolumn
 
+"set statusline=%f\ %2*%m\ %1*%h%r%=[%{&encoding}\ %{&fileformat}\ %{strlen(&ft)?&ft:'none'}\ %{getfperm(@%)}]\ 0x%B\ %12.(%c:%l/%L%)
+"set statusline=%<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P
+"set laststatus=2
 " }}}
 " {{{ colors
 " tabe line colors
