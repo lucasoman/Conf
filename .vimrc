@@ -102,8 +102,14 @@ set cindent
 set showmatch
 set matchtime=1
 
+" t: autowrap text using textwidth
+" l: long lines are not broken in insert mode
+" c: autowrap comments using textwidth, inserting leader
+" r: insert comment leader after <CR>
+" o: insert comment leader after o or O
 set formatoptions-=t
 set formatoptions+=lcro
+set textwidth=60
 
 " context while scrolling
 set scrolloff=3
