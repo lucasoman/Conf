@@ -136,6 +136,9 @@ endif
 " complete to longest match, then list possibilities
 set wildmode=longest,list
 
+" turn off swap files
+set noswapfile
+
 " }}}
 " {{{ filetype dependent
 " dictionary of php function names for c-x-c-k
@@ -167,8 +170,8 @@ vmap >> >gv
 vmap << <gv
 nmap \l o----------------------------------------------------<CR><ESC>
 " phpdoc comments
-nmap \cb o/**<CR><BS> * <CR>*<CR>* @author Lucas Oman <lucas.oman@bookit.com><CR>* @param <CR>* @return <CR>* @example <CR>*/<ESC>kkkkkk$a
-nmap \cp o/**<CR><BS> * <CR>*<CR>* @author Lucas Oman <me@lucasoman.com><CR>* @param <CR>* @return <CR>* @example <CR>*/<ESC>kkkkkk$a
+nmap \cb o/**<CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
+nmap \cp o/**<CR><CR><CR>@author Lucas Oman <me@lucasoman.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
 nmap \sc :!svnconsole.php<CR><CR>
 nmap \sd :!svn diff %<CR>
 " Open Current (path)
