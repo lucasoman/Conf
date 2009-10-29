@@ -294,7 +294,7 @@ if version >= 700
 
 	" return properly formatted timestamp
 	function ListTimestamp()
-		return ' ['.strftime('%Y-%m-%d %T').']'
+		return ' ['.strftime('%y-%m-%d %H:%M').']'
 	endfunction
 
 	" return fold line format
