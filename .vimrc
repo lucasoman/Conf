@@ -178,6 +178,8 @@ nmap \l o----------------------------------------------------<CR><ESC>
 " phpdoc comments
 nmap \cb o/**<CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
 nmap \cp o/**<CR><CR><CR>@author Lucas Oman <me@lucasoman.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
+vmap \cc :s!^!//!<CR>
+vmap \cu :s!^//!!<CR>
 nmap \sc :!svnconsole.php<CR><CR>
 nmap \sd :!svn diff %<CR>
 " Open Current (path)
