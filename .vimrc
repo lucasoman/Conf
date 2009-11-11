@@ -176,6 +176,7 @@ vmap >> >gv
 vmap << <gv
 nmap \l o----------------------------------------------------<CR><ESC>
 " phpdoc comments
+nmap \cc o/**<CR>$Rev$<CR>$Date$<CR>$Id$<CR>$Author$<CR>$HeadURL$<CR><CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR><BS>/<ESC>kkk$a 
 nmap \cb o/**<CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
 nmap \cp o/**<CR><CR><CR>@author Lucas Oman <me@lucasoman.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
 vmap \cc :s!^!//!<CR>
@@ -194,6 +195,8 @@ set pastetoggle=<F5>
 nmap <F6> <ESC>:!~/lib/updatedev.php<CR>
 nmap <F7> <ESC>:!~/lib/updatedev.php %:p<CR>
 nmap <F8> <ESC>:call WriteTrace()<CR>
+nmap <F11> <ESC>:!php %<CR>
+nmap <F12> <ESC>:!php -l %<CR>
 " }}}
 " abbreviations {{{
 ab _test print('lbotest: '.rand());//lbotest
@@ -251,7 +254,7 @@ endfunction
 "{{{ session stuff
 " don't store any options in sessions
 if version >= 700
-  set sessionoptions=blank,buffers,curdir,tabpages,winpos,folds
+  set sessionoptions=blank,tabpages,folds
 endif
 
 " automatically update session, if loaded
