@@ -6,7 +6,8 @@
 " --enable-rubyinterp --prefix=/usr --enable-ruby
 
 set nocompatible
-syntax on filetype on
+syntax on
+filetype on
 
 " fast terminal for smoother redrawing
 set ttyfast
@@ -148,6 +149,7 @@ set noswapfile
 " }}}
 " {{{ filetype dependent
 " dictionary of php function names for c-x-c-k
+"autocmd BufNewFile,BufRead *.php setlocal filetype=php
 autocmd FileType php setlocal dictionary=~/.vim/funclist.txt
 " I wanted to start with all folds closed, but vim is slightly retarded:
 " C-r and C-m will always add or subtract from foldlevel, even if there are no more folds to affect,
@@ -178,11 +180,12 @@ nmap \l o----------------------------------------------------<CR><ESC>
 " phpdoc comments
 nmap \cc o/**<CR>$Rev$<CR>$Date$<CR>$Id$<CR>$Author$<CR>$HeadURL$<CR><CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR><BS>/<ESC>kkk$a 
 nmap \cb o/**<CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
+nmap \cv o/**<CR><CR><CR>@var <CR><BS>/<ESC>kkk$a
 nmap \cp o/**<CR><CR><CR>@author Lucas Oman <me@lucasoman.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
 vmap \cc :s!^!//!<CR>
 vmap \cu :s!^//!!<CR>
 nmap \sc :!svnconsole.php<CR><CR>
-nmap \sd :!svn diff %<CR>
+nmap \sd :!svn diff % \| less -F<CR>
 " Open Current (path)
 nmap \oc :tabe %:h<CR>
 " fix a block of XML; inserts newlines, indents properly, folds by indent
@@ -254,18 +257,40 @@ endfunction
 "{{{ session stuff
 " don't store any options in sessions
 if version >= 700
-  set sessionoptions=blank,tabpages,folds
+	" localoptions has to be here:
+	" for some reason, new session loading code fails to set filetype of files in session
+  set sessionoptions=blank,tabpages,folds,localoptions
 endif
 
-" automatically update session, if loaded
 let s:sessionloaded = 0
+let s:loadingsession = 0
+let s:sessionfile = ''
+let s:netrwsort = ''
+autocmd BufRead *.vim call LoadSessionFinish()
 function LoadSession()
-  source Session.vim
-  let s:sessionloaded = 1
+	" save current netrw sort sequence
+	let s:netrwsort = g:netrw_sort_sequence
+	" show sessions first, then dirs
+	let g:netrw_sort_sequence = '\.vim$,[\/]$'
+	let s:loadingsession = 1
+	e .
+endfunction
+function LoadSessionFinish()
+	if s:loadingsession == 1
+		let s:loadingsession = 0
+		let s:sessionloaded = 1
+		" restore previous sort sequence setting
+		let g:netrw_sort_sequence = s:netrwsort
+		" save session filename for saving on exit
+		let s:sessionfile = bufname('%')
+		source %
+	end
 endfunction
 function SaveSession()
   if s:sessionloaded == 1
-    mksession!
+		let s:sessionloaded = 0
+		" re-save session before exiting
+    exe "mksession! ".s:sessionfile
   end
 endfunction
 autocmd VimLeave * call SaveSession()
@@ -410,4 +435,7 @@ let g:rainbow_brace = 1
 let g:rainbow_bracket = 1
 let g:rainbow_paren = 1
 autocmd BufWinEnter * source $HOME/.vim/plugin/rainbow_paren.vim
+"}}}
+" netrw {{{
+let g:netrw_sort_sequence = '[\/]$,\.php,\.phtml,*,\.info$,\.swp$,\.bak$,\~$'
 "}}}
