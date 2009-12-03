@@ -163,33 +163,34 @@ autocmd BufNewFile,BufRead *.thtml setlocal filetype=php
 autocmd FileType ruby setlocal commentstring=#%s
 "}}}
 " {{{ mapped shortcuts
+let mapleader = "\\"
 " quicker aliases for navigating tabs
 nmap H <ESC>gT
 nmap L <ESC>gt
 " creates a fold from a block of code in {}s
-nmap \pf <ESC>$va}zf
+nmap <Leader>pf <ESC>$va}zf
 " php syntax check
-nmap \ps <ESC>:!php -l %<CR>
-nmap \ff <ESC>:call ToggleFoldFuncs()<CR>
+nmap <Leader>ps <ESC>:!php -l %<CR>
+nmap <Leader>ff <ESC>:call ToggleFoldFuncs()<CR>
 " turns of highlighting
-nmap \/ <ESC>:nohl<CR>
+nmap <Leader>/ <ESC>:nohl<CR>
 " keep block highlighted when indenting
 vmap >> >gv
 vmap << <gv
-nmap \l o----------------------------------------------------<CR><ESC>
+nmap <Leader>l o----------------------------------------------------<CR><ESC>
 " phpdoc comments
-nmap \cc o/**<CR>$Rev$<CR>$Date$<CR>$Id$<CR>$Author$<CR>$HeadURL$<CR><CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR><BS>/<ESC>kkk$a 
-nmap \cb o/**<CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
-nmap \cv o/**<CR><CR><CR>@var <CR><BS>/<ESC>kkk$a
-nmap \cp o/**<CR><CR><CR>@author Lucas Oman <me@lucasoman.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
-vmap \cc :s!^!//!<CR>
-vmap \cu :s!^//!!<CR>
-nmap \sc :!svnconsole.php<CR><CR>
-nmap \sd :!svn diff % \| less -F<CR>
+nmap <Leader>cc o/**<CR>$Rev$<CR>$Date$<CR>$Id$<CR>$Author$<CR>$HeadURL$<CR><CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR><BS>/<ESC>kkk$a 
+nmap <Leader>cb o/**<CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
+nmap <Leader>cv o/**<CR><CR><CR>@var <CR><BS>/<ESC>kkk$a
+nmap <Leader>cp o/**<CR><CR><CR>@author Lucas Oman <me@lucasoman.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
+vmap <Leader>cc :s!^!//!<CR>
+vmap <Leader>cu :s!^//!!<CR>
+nmap <Leader>sc :!svnconsole.php<CR><CR>
+nmap <Leader>sd :!svn diff % \| less -F<CR>
 " Open Current (path)
-nmap \oc :tabe %:h<CR>
+nmap <Leader>oc :tabe %:h<CR>
 " fix a block of XML; inserts newlines, indents properly, folds by indent
-nmap \fx <Esc>:setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format -<CR>:setlocal foldmethod=indent<CR>
+nmap <Leader>fx <Esc>:setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format -<CR>:setlocal foldmethod=indent<CR>
 nmap <F2> <ESC>:call ToggleColumns()<CR>
 imap <F2> <C-o>:call ToggleColumns()<CR>
 nmap <F3> <ESC>:call LoadSession()<CR>
