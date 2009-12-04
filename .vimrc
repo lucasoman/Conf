@@ -167,6 +167,9 @@ let mapleader = "\\"
 " quicker aliases for navigating tabs
 nmap H <ESC>gT
 nmap L <ESC>gt
+" easier page up/down
+nmap <C-j> <C-d>
+nmap <C-k> <C-u>
 " creates a fold from a block of code in {}s
 nmap <Leader>pf <ESC>$va}zf
 " php syntax check
