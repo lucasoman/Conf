@@ -435,13 +435,6 @@ let php_htmlInStrings = 1  "for HTML syntax highlighting inside strings
 "php_noShortTags = 1  "don't sync <? ?> as php
 let php_folding = 1  "for folding classes and functions
 " }}}
-" rainbow parens {{{
-let g:rainbow = 1
-let g:rainbow_brace = 1
-let g:rainbow_bracket = 1
-let g:rainbow_paren = 1
-autocmd BufWinEnter * source $HOME/.vim/plugin/rainbow_paren.vim
-"}}}
 " netrw {{{
 let g:netrw_sort_sequence = '[\/]$,\.php,\.phtml,*,\.info$,\.swp$,\.bak$,\~$'
 "}}}
