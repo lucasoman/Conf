@@ -163,6 +163,8 @@ autocmd BufNewFile,BufRead *.thtml setlocal filetype=php
 
 " ruby commenstring
 autocmd FileType ruby setlocal commentstring=#%s
+
+autocmd FileTYpe python setlocal nocindent autoindent
 "}}}
 " {{{ mapped shortcuts
 let mapleader = "\\"
