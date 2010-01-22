@@ -196,6 +196,8 @@ nmap <Leader>sc :!svnconsole.php<CR><CR>
 nmap <Leader>sd :!svn diff % \| less -F<CR>
 " Open Current (path)
 nmap <Leader>oc :tabe %:h<CR>
+" swap to last tab
+nmap <Leader>tl :exe "tabn ".g:lasttab<CR>
 " fix a block of XML; inserts newlines, indents properly, folds by indent
 nmap <Leader>fx <Esc>:setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format -<CR>:setlocal foldmethod=indent<CR>
 nmap <F2> <ESC>:call ToggleColumns()<CR>
@@ -425,6 +427,11 @@ if version >= 700
 	" Use the above tabe naming scheme
 	set tabline=%!MyTabLine()
 endif
+
+" for <Leader>tl shortcut
+" switches to last tab
+let g:lasttab = 1
+au TabLeave * let g:lasttab = tabpagenr()
 "}}}
 "php syntax options {{{
 let php_sql_query = 1  "for SQL syntax highlighting inside strings
