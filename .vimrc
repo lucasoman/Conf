@@ -4,6 +4,7 @@
 " By Lucas Oman
 " me@lucasoman.com
 " --enable-rubyinterp --prefix=/usr --enable-ruby
+" from: http://github.com/lucasoman/Conf/raw/master/.vimrc
 
 set nocompatible
 syntax on
