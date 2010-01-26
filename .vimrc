@@ -194,7 +194,8 @@ nmap <Leader>cp o/**<CR><CR><CR>@author Lucas Oman <me@lucasoman.com><CR>@param 
 vmap <Leader>cc :s!^!//!<CR>
 vmap <Leader>cu :s!^//!!<CR>
 nmap <Leader>sc :!svnconsole.php<CR><CR>
-nmap <Leader>sd :!svn diff % \| less -F<CR>
+nmap <Leader>sd :call SvnDiff(bufname('%'))<CR>
+nmap <Leader>sl :call SvnLog(bufname('%'))<CR>
 " Open Current (path)
 nmap <Leader>oc :tabe %:h<CR>
 " swap to last tab
@@ -433,6 +434,17 @@ endif
 " switches to last tab
 let g:lasttab = 1
 au TabLeave * let g:lasttab = tabpagenr()
+"}}}
+"svn stuff {{{
+function SvnDiff(file)
+	tabe
+	exe "r !svn diff ".a:file
+	setlocal filetype=diff
+endfunction
+function SvnLog(file)
+	tabe
+	exe "r !svn log -v ".a:file
+endfunction
 "}}}
 "php syntax options {{{
 let php_sql_query = 1  "for SQL syntax highlighting inside strings
