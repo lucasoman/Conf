@@ -170,18 +170,20 @@ autocmd FileTYpe python setlocal nocindent autoindent
 " {{{ mapped shortcuts
 let mapleader = "\\"
 " quicker aliases for navigating tabs
-nmap H <ESC>gT
-nmap L <ESC>gt
+nmap H gT
+nmap L gt
 " easier page up/down
 nmap <C-j> <C-d>
 nmap <C-k> <C-u>
 " creates a fold from a block of code in {}s
-nmap <Leader>pf <ESC>$va}zf
+nmap <Leader>pf $va}zf
 " php syntax check
-nmap <Leader>ps <ESC>:!php -l %<CR>
-nmap <Leader>ff <ESC>:call ToggleFoldFuncs()<CR>
+nmap <Leader>ps :!php -l %<CR>
+nmap <Leader>ff :call ToggleFoldFuncs()<CR>
 " turns of highlighting
-nmap <Leader>/ <ESC>:nohl<CR>
+nmap <Leader>/ :nohl<CR>
+" search for highlighted text
+vmap // y/<C-R>"<CR>
 " keep block highlighted when indenting
 vmap >> >gv
 vmap << <gv
@@ -201,17 +203,17 @@ nmap <Leader>oc :tabe %:h<CR>
 " swap to last tab
 nmap <Leader>tl :exe "tabn ".g:lasttab<CR>
 " fix a block of XML; inserts newlines, indents properly, folds by indent
-nmap <Leader>fx <Esc>:setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format -<CR>:setlocal foldmethod=indent<CR>
-nmap <F2> <ESC>:call ToggleColumns()<CR>
+nmap <Leader>fx :setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format -<CR>:setlocal foldmethod=indent<CR>
+nmap <F2> :call ToggleColumns()<CR>
 imap <F2> <C-o>:call ToggleColumns()<CR>
-nmap <F3> <ESC>:call LoadSession()<CR>
-nmap <F4> <ESC>:!updater<CR>
+nmap <F3> :call LoadSession()<CR>
+nmap <F4> :!updater<CR>
 set pastetoggle=<F5>
-nmap <F6> <ESC>:!~/lib/updatedev.php<CR>
-nmap <F7> <ESC>:!~/lib/updatedev.php %:p<CR>
-nmap <F8> <ESC>:call WriteTrace()<CR>
-nmap <F11> <ESC>:!php %<CR>
-nmap <F12> <ESC>:!php -l %<CR>
+nmap <F6> :!~/lib/updatedev.php<CR>
+nmap <F7> :!~/lib/updatedev.php %:p<CR>
+nmap <F8> :call WriteTrace()<CR>
+nmap <F11> :!php %<CR>
+nmap <F12> :!php -l %<CR>
 " }}}
 " abbreviations {{{
 ab _test print('lbotest: '.rand());//lbotest
