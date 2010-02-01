@@ -172,6 +172,8 @@ let mapleader = "\\"
 " quicker aliases for navigating tabs
 nmap H gT
 nmap L gt
+nmap <C-l> :call MoveTab(0)<CR>
+nmap <C-h> :call MoveTab(-2)<CR>
 " easier page up/down
 nmap <C-j> <C-d>
 nmap <C-k> <C-u>
@@ -179,6 +181,7 @@ nmap <C-k> <C-u>
 nmap <Leader>pf $va}zf
 " php syntax check
 nmap <Leader>ps :!php -l %<CR>
+nmap <Leader>pr :!php %<CR>
 nmap <Leader>ff :call ToggleFoldFuncs()<CR>
 " turns of highlighting
 nmap <Leader>/ :nohl<CR>
@@ -209,11 +212,9 @@ imap <F2> <C-o>:call ToggleColumns()<CR>
 nmap <F3> :call LoadSession()<CR>
 nmap <F4> :!updater<CR>
 set pastetoggle=<F5>
-nmap <F6> :!~/lib/updatedev.php<CR>
-nmap <F7> :!~/lib/updatedev.php %:p<CR>
+nmap <F6> :!updatedev.php<CR>
+nmap <F7> :!updatedev.php %:p<CR>
 nmap <F8> :call WriteTrace()<CR>
-nmap <F11> :!php %<CR>
-nmap <F12> :!php -l %<CR>
 " }}}
 " abbreviations {{{
 ab _test print('lbotest: '.rand());//lbotest
@@ -389,7 +390,8 @@ if version >= 700
 	endfunction
 endif
 "}}}
-"{{{ tab line stuff
+"{{{ tab stuff
+"tab line
 function MyTabLine()
 	let s = ''
 	for i in range(tabpagenr('$'))
@@ -412,7 +414,6 @@ function MyTabLine()
 
 	return s
 endfunction
-
 function MyTabLabel(n)
 	let buflist = tabpagebuflist(a:n)
 	let winnr = tabpagewinnr(a:n)
@@ -426,7 +427,6 @@ function MyTabLabel(n)
 	endif
 	return modified.fullname
 endfunction
-
 if version >= 700
 	" Use the above tabe naming scheme
 	set tabline=%!MyTabLine()
@@ -436,6 +436,13 @@ endif
 " switches to last tab
 let g:lasttab = 1
 au TabLeave * let g:lasttab = tabpagenr()
+
+"tab moving
+function MoveTab(n)
+	let which = tabpagenr()
+	let which = which + a:n
+	exe "tabm ".which
+endfunction
 "}}}
 "svn stuff {{{
 function SvnDiff(file)
