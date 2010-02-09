@@ -174,14 +174,15 @@ nmap H gT
 nmap L gt
 nmap <C-l> :call MoveTab(0)<CR>
 nmap <C-h> :call MoveTab(-2)<CR>
-" easier page up/down
-nmap <C-j> <C-d>
-nmap <C-k> <C-u>
+" easier move screen up/down
+nmap <C-j> <C-e>
+nmap <C-k> <C-y>
 " creates a fold from a block of code in {}s
 nmap <Leader>pf $va}zf
 " php syntax check
 nmap <Leader>ps :!php -l %<CR>
-nmap <Leader>pr :!php %<CR>
+nmap <Leader>pr :!php % \| less -F<CR>
+nmap <Leader>ph :!php --rf <cword><CR>
 nmap <Leader>ff :call ToggleFoldFuncs()<CR>
 " turns of highlighting
 nmap <Leader>/ :nohl<CR>
@@ -215,6 +216,7 @@ set pastetoggle=<F5>
 nmap <F6> :!updatedev.php<CR>
 nmap <F7> :!updatedev.php %:p<CR>
 nmap <F8> :call WriteTrace()<CR>
+nmap <F9> :!php --rf <cword><CR>
 " }}}
 " abbreviations {{{
 ab _test print('lbotest: '.rand());//lbotest
