@@ -56,8 +56,8 @@ endif
 set hlsearch
 
 " highlight position of cursor
-set cursorline
-set cursorcolumn
+"set cursorline
+"set cursorcolumn
 
 "set statusline=%f\ %2*%m\ %1*%h%r%=[%{&encoding}\ %{&fileformat}\ %{strlen(&ft)?&ft:'none'}\ %{getfperm(@%)}]\ 0x%B\ %12.(%c:%l/%L%)
 "set statusline=%<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P
@@ -65,16 +65,16 @@ set cursorcolumn
 " }}}
 " {{{ colors
 " tabe line colors
-highlight TabLineFill ctermfg=0
-highlight TabLine ctermfg=7 ctermbg=0 cterm=none
-highlight TabLineSel ctermfg=7 cterm=bold ctermbg=0
+highlight TabLineFill ctermfg=DarkGray
+highlight TabLine ctermfg=7 ctermbg=DarkGray cterm=none
+highlight TabLineSel ctermfg=7 cterm=bold ctermbg=DarkGray
 
 " number column colors
-highlight LineNr cterm=bold ctermbg=0 cterm=none ctermfg=4
+highlight LineNr cterm=bold ctermbg=DarkGray cterm=none ctermfg=4
 
 " fold colors
-highlight Folded cterm=bold ctermbg=0 cterm=none ctermfg=4
-highlight FoldColumn cterm=bold ctermbg=0 cterm=none ctermfg=4
+highlight Folded cterm=bold ctermbg=DarkGray cterm=none ctermfg=4
+highlight FoldColumn cterm=bold ctermbg=DarkGray cterm=none ctermfg=4
 
 " visual mode colors
 highlight Visual ctermbg=7 ctermfg=4
@@ -83,8 +83,8 @@ highlight Visual ctermbg=7 ctermfg=4
 highlight Pmenu ctermbg=7 ctermfg=0
 highlight PmenuSel ctermbg=1 ctermfg=0
 
-highlight CursorColumn cterm=bold ctermbg=0 cterm=none
-highlight CursorLine cterm=bold ctermbg=0 cterm=none
+highlight CursorColumn cterm=bold ctermbg=DarkGray cterm=none
+highlight CursorLine cterm=bold ctermbg=DarkGray cterm=none
 
 highlight Search cterm=none ctermbg=7 ctermfg=4
 
