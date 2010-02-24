@@ -56,8 +56,8 @@ endif
 set hlsearch
 
 " highlight position of cursor
-"set cursorline
-"set cursorcolumn
+set cursorline
+set cursorcolumn
 
 "set statusline=%f\ %2*%m\ %1*%h%r%=[%{&encoding}\ %{&fileformat}\ %{strlen(&ft)?&ft:'none'}\ %{getfperm(@%)}]\ 0x%B\ %12.(%c:%l/%L%)
 "set statusline=%<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P
