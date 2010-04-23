@@ -88,6 +88,12 @@ highlight CursorLine cterm=bold ctermbg=DarkGray cterm=none
 
 highlight Search cterm=none ctermbg=7 ctermfg=4
 
+" diff colors
+highlight DiffAdd cterm=none ctermbg=Green
+highlight DiffDelete cterm=none ctermbg=Red
+highlight DiffChange cterm=none ctermbg=none
+highlight DiffText cterm=none ctermbg=Magenta
+
 " the dark colors kill my eyes
 set background=light
 " }}}
