@@ -9,6 +9,7 @@
 set nocompatible
 syntax on
 filetype on
+filetype plugin on
 
 " fast terminal for smoother redrawing
 set ttyfast
@@ -81,12 +82,7 @@ highlight Visual ctermbg=7 ctermfg=4
 
 " dictionary menu colors
 highlight Pmenu ctermbg=7 ctermfg=0
-highlight PmenuSel ctermbg=1 ctermfg=0
-
-highlight CursorColumn cterm=bold ctermbg=DarkGray cterm=none
-highlight CursorLine cterm=bold ctermbg=DarkGray cterm=none
-
-highlight Search cterm=none ctermbg=7 ctermfg=4
+highlight PmenuSel ctermbg=Yellow ctermfg=0
 
 " diff colors
 highlight DiffAdd cterm=none ctermbg=Green
@@ -94,10 +90,18 @@ highlight DiffDelete cterm=none ctermbg=Red
 highlight DiffChange cterm=none ctermbg=none
 highlight DiffText cterm=none ctermbg=Magenta
 
+" keep cursor column last so it overrides all others
+highlight CursorColumn cterm=bold ctermbg=DarkGray cterm=none
+highlight CursorLine cterm=bold ctermbg=DarkGray cterm=none
+
+highlight Search cterm=none ctermbg=7 ctermfg=4
+
 " the dark colors kill my eyes
 set background=light
 " }}}
 " {{{ behavior
+set omnifunc=syntaxcomplete#Complete
+
 set shiftwidth=2
 set tabstop=2
 set cindent
@@ -205,6 +209,7 @@ nmap <Leader>cv o/**<CR><CR><CR>@var <CR><BS>/<ESC>kkk$a
 nmap <Leader>cp o/**<CR><CR><CR>@author Lucas Oman <me@lucasoman.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
 vmap <Leader>cc :s!^!//!<CR>
 vmap <Leader>cu :s!^//!!<CR>
+" svn
 nmap <Leader>sc :!svnconsole.php<CR><CR>
 nmap <Leader>sd :call SvnDiff(bufname('%'))<CR>
 nmap <Leader>sl :call SvnLog(bufname('%'))<CR>
@@ -212,8 +217,12 @@ nmap <Leader>sl :call SvnLog(bufname('%'))<CR>
 nmap <Leader>oc :tabe %:h<CR>
 " swap to last tab
 nmap <Leader>tl :exe "tabn ".g:lasttab<CR>
+" ctags
+nmap <Leader>tf :call CtagsFind(expand('<cword>'))<CR>
+nmap <Leader>ts :exe('stag '.expand('<cword>'))<CR>
 " fix a block of XML; inserts newlines, indents properly, folds by indent
 nmap <Leader>fx :setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format -<CR>:setlocal foldmethod=indent<CR>
+"f keys
 nmap <F2> :call ToggleColumns()<CR>
 imap <F2> <C-o>:call ToggleColumns()<CR>
 nmap <F3> :call LoadSession()<CR>
@@ -276,6 +285,15 @@ function WriteTrace()
 
 	call writefile(allLines,$HOME."/trace.txt")
 endfunction
+"}}}
+"{{{CleverTab()
+function! CleverTab()
+	   if strpart( getline('.'), 0, col('.')-1 ) =~ '^\s*$'
+	      return "\<Tab>"
+	   else
+	      return "\<C-N>"
+	endfunction
+	inoremap <Tab> <C-R>=CleverTab()<CR>
 "}}}
 "{{{ session stuff
 " don't store any options in sessions
@@ -461,6 +479,12 @@ endfunction
 function SvnLog(file)
 	tabe
 	exe "r !svn log -v ".a:file
+endfunction
+"}}}
+"{{{ctags stuff
+function CtagsFind(file)
+	tabe
+	exe "tag ".a:file
 endfunction
 "}}}
 "php syntax options {{{
