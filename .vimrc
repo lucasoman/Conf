@@ -9,7 +9,7 @@
 set nocompatible
 syntax on
 filetype on
-filetype plugin on
+"filetype plugin on
 
 " fast terminal for smoother redrawing
 set ttyfast
@@ -85,10 +85,10 @@ highlight Pmenu ctermbg=7 ctermfg=0
 highlight PmenuSel ctermbg=Yellow ctermfg=0
 
 " diff colors
-highlight DiffAdd cterm=none ctermbg=Green
-highlight DiffDelete cterm=none ctermbg=Red
+highlight DiffAdd cterm=none ctermbg=DarkGray
+highlight DiffDelete cterm=none ctermbg=DarkGray
 highlight DiffChange cterm=none ctermbg=none
-highlight DiffText cterm=none ctermbg=Magenta
+highlight DiffText cterm=none ctermbg=DarkGray
 
 " keep cursor column last so it overrides all others
 highlight CursorColumn cterm=bold ctermbg=DarkGray cterm=none
@@ -121,7 +121,7 @@ set matchtime=1
 " o: insert comment leader after o or O
 set formatoptions-=t
 set formatoptions+=lcro
-set textwidth=60
+set textwidth=80
 
 " context while scrolling
 set scrolloff=3
@@ -213,13 +213,14 @@ vmap <Leader>cu :s!^//!!<CR>
 nmap <Leader>sc :!svnconsole.php<CR><CR>
 nmap <Leader>sd :call SvnDiff(bufname('%'))<CR>
 nmap <Leader>sl :call SvnLog(bufname('%'))<CR>
+nmap <Leader>sk :!svn propset svn:keywords "Rev Date Id Author HeadURL" %<CR>
 " Open Current (path)
 nmap <Leader>oc :tabe %:h<CR>
 " swap to last tab
 nmap <Leader>tl :exe "tabn ".g:lasttab<CR>
 " ctags
 nmap <Leader>tf :call CtagsFind(expand('<cword>'))<CR>
-nmap <Leader>ts :exe('stag '.expand('<cword>'))<CR>
+nmap <Leader>ts :exe('stj '.expand('<cword>'))<CR>
 " fix a block of XML; inserts newlines, indents properly, folds by indent
 nmap <Leader>fx :setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format -<CR>:setlocal foldmethod=indent<CR>
 "f keys
@@ -288,12 +289,12 @@ endfunction
 "}}}
 "{{{CleverTab()
 function! CleverTab()
-	   if strpart( getline('.'), 0, col('.')-1 ) =~ '^\s*$'
-	      return "\<Tab>"
-	   else
-	      return "\<C-N>"
-	endfunction
-	inoremap <Tab> <C-R>=CleverTab()<CR>
+	if strpart( getline('.'), 0, col('.')-1 ) =~ '^\s*$'
+		return "\<Tab>"
+	else
+		return "\<C-N>"
+endfunction
+inoremap <Tab> <C-R>=CleverTab()<CR>
 "}}}
 "{{{ session stuff
 " don't store any options in sessions
@@ -484,7 +485,7 @@ endfunction
 "{{{ctags stuff
 function CtagsFind(file)
 	tabe
-	exe "tag ".a:file
+	exe "tj ".a:file
 endfunction
 "}}}
 "php syntax options {{{
