@@ -223,6 +223,8 @@ nmap <Leader>tf :call CtagsFind(expand('<cword>'))<CR>
 nmap <Leader>ts :exe('stj '.expand('<cword>'))<CR>
 " fix a block of XML; inserts newlines, indents properly, folds by indent
 nmap <Leader>fx :setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format -<CR>:setlocal foldmethod=indent<CR>
+" diff stuff
+nmap <Leader>ds :call SvnDiffSplit(expand('%:h'),expand('%:t'))<CR>
 "f keys
 nmap <F2> :call ToggleColumns()<CR>
 imap <F2> <C-o>:call ToggleColumns()<CR>
@@ -480,6 +482,10 @@ endfunction
 function SvnLog(file)
 	tabe
 	exe "r !svn log -v ".a:file
+endfunction
+function SvnDiffSplit(path,file)
+	exe "!svn export -r HEAD ".a:path."/".a:file." ~/tmp/".a:file
+	exe "vert diffsplit ~/tmp/".a:file
 endfunction
 "}}}
 "{{{ctags stuff
