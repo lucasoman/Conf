@@ -213,6 +213,8 @@ vmap <Leader>cu :s!^//!!<CR>
 nmap <Leader>sc :!svnconsole.php<CR><CR>
 nmap <Leader>sd :call SvnDiff(bufname('%'))<CR>
 nmap <Leader>sl :call SvnLog(bufname('%'))<CR>
+nmap <Leader>si :call SvnInfo(bufname('%'))<CR>
+nmap <Leader>sb :call SvnBlame(bufname('%'))<CR>
 nmap <Leader>sk :!svn propset svn:keywords "Rev Date Id Author HeadURL" %<CR>
 " Open Current (path)
 nmap <Leader>oc :tabe %:h<CR>
@@ -483,9 +485,17 @@ function SvnLog(file)
 	tabe
 	exe "r !svn log -v ".a:file
 endfunction
+function SvnInfo(file)
+	tabe
+	exe "r !svn info ".a:file
+endfunction
 function SvnDiffSplit(path,file)
 	exe "!svn export -r HEAD ".a:path."/".a:file." ~/tmp/".a:file
 	exe "vert diffsplit ~/tmp/".a:file
+endfunction
+function SvnBlame(file)
+	tabe
+	exe "r !svn blame ".a:file
 endfunction
 "}}}
 "{{{ctags stuff
