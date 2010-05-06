@@ -211,11 +211,12 @@ vmap <Leader>cc :s!^!//!<CR>
 vmap <Leader>cu :s!^//!!<CR>
 " svn
 nmap <Leader>sc :!svnconsole.php<CR><CR>
-nmap <Leader>sd :call SvnDiff(bufname('%'))<CR>
-nmap <Leader>sl :call SvnLog(bufname('%'))<CR>
-nmap <Leader>si :call SvnInfo(bufname('%'))<CR>
-nmap <Leader>sb :call SvnBlame(bufname('%'))<CR>
+nmap <Leader>sd :call SvnDiff(bufname('%'))<CR>gg
+nmap <Leader>sl :call SvnLog(bufname('%'))<CR>gg
+nmap <Leader>si :call SvnInfo(bufname('%'))<CR>gg
+nmap <Leader>sb :call SvnBlame(bufname('%'))<CR>gg
 nmap <Leader>sk :!svn propset svn:keywords "Rev Date Id Author HeadURL" %<CR>
+nmap <Leader>sr :call SvnModeDiff(expand('<cword>'))<CR>gg
 " Open Current (path)
 nmap <Leader>oc :tabe %:h<CR>
 " swap to last tab
@@ -477,25 +478,73 @@ endfunction
 "}}}
 "svn stuff {{{
 function SvnDiff(file)
-	tabe
-	exe "r !svn diff ".a:file
+	let file = SvnModeWindow(a:file)
+	exe "r !svn diff ".l:file
 	setlocal filetype=diff
 endfunction
 function SvnLog(file)
-	tabe
-	exe "r !svn log -v ".a:file
+	let file = SvnModeWindow(a:file)
+	exe "r !svn log -v ".l:file
 endfunction
 function SvnInfo(file)
-	tabe
-	exe "r !svn info ".a:file
+	let file = SvnModeWindow(a:file)
+	exe "r !svn info ".l:file
+endfunction
+function SvnBlame(file)
+	let file = SvnModeWindow(a:file)
+	exe "r !svn blame ".l:file
 endfunction
 function SvnDiffSplit(path,file)
 	exe "!svn export -r HEAD ".a:path."/".a:file." ~/tmp/".a:file
 	exe "vert diffsplit ~/tmp/".a:file
 endfunction
-function SvnBlame(file)
-	tabe
-	exe "r !svn blame ".a:file
+
+" svn mode
+" set svn mode for this window
+function SvnModeSet(file)
+	let w:svnMode = 1
+	let w:svnFile = a:file
+endfunction
+" create new window in svn mode
+" uses given file if current window is not already in svn mode
+" otherwise, closes current window, creates new, sets svnmode on it and returns svnFile from previous window
+function SvnModeWindow(file)
+	if !SvnMode()
+		tabe
+		let file = a:file
+	else
+		let file = w:svnFile
+		exe "q!"
+		tabe
+	endif
+	setl buftype=nofile
+	call SvnModeSet(l:file)
+	return l:file
+endfunction
+" are we in svnmode?
+function SvnMode()
+	if !exists('w:svnMode') || w:svnMode == 0
+		return 0
+	endif
+	return 1
+endfunction
+function SvnModeError()
+	echo "You're not in SVN mode!"
+endfunction
+" given a revision string ("r1234" or "1234"), displays diff of that revision
+function SvnModeDiff(rev)
+	if SvnMode()
+		if strpart(a:rev,0,1) == 'r'
+			let num = strpart(a:rev,1)
+		else
+			let num = a:rev
+		endif
+		let file = SvnModeWindow('')
+		exe "r !svn diff -c ".l:num." ".l:file
+		setl filetype=diff
+	else
+		call SvnModeError()
+	endif
 endfunction
 "}}}
 "{{{ctags stuff
