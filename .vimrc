@@ -211,16 +211,9 @@ vmap <Leader>cc :s!^!//!<CR>
 vmap <Leader>cu :s!^//!!<CR>
 " svn
 nmap <Leader>sc :!svnconsole.php<CR><CR>
-nmap <Leader>sd :call SvnDiff(bufname('%'))<CR>gg
-nmap <Leader>sl :call SvnLog(bufname('%'))<CR>gg
-nmap <Leader>si :call SvnInfo(bufname('%'))<CR>gg
-nmap <Leader>sb :call SvnBlame(bufname('%'))<CR>gg
 nmap <Leader>sk :!svn propset svn:keywords "Rev Date Id Author HeadURL" %<CR>
-nmap <Leader>sr :call SvnModeDiff(expand('<cword>'))<CR>gg
 " Open Current (path)
 nmap <Leader>oc :tabe %:h<CR>
-" swap to last tab
-nmap <Leader>tl :exe "tabn ".g:lasttab<CR>
 " ctags
 nmap <Leader>tf :call CtagsFind(expand('<cword>'))<CR>
 nmap <Leader>ts :exe('stj '.expand('<cword>'))<CR>
@@ -464,11 +457,6 @@ if version >= 700
 	set tabline=%!MyTabLine()
 endif
 
-" for <Leader>tl shortcut
-" switches to last tab
-let g:lasttab = 1
-au TabLeave * let g:lasttab = tabpagenr()
-
 "tab moving
 function MoveTab(n)
 	let which = tabpagenr()
@@ -477,6 +465,12 @@ function MoveTab(n)
 endfunction
 "}}}
 "svn stuff {{{
+nmap <Leader>sd :call SvnDiff(bufname('%'))<CR>gg
+nmap <Leader>sl :call SvnLog(bufname('%'))<CR>gg
+nmap <Leader>si :call SvnInfo(bufname('%'))<CR>gg
+nmap <Leader>sb :call SvnBlame(bufname('%'))<CR>gg
+nmap <Leader>sr :call SvnModeDiff(expand('<cword>'))<CR>gg
+
 function SvnDiff(file)
 	let file = SvnModeWindow(a:file)
 	exe "r !svn diff ".l:file
