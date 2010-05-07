@@ -465,10 +465,10 @@ function MoveTab(n)
 endfunction
 "}}}
 "svn stuff {{{
-nmap <Leader>sd :call SvnDiff(bufname('%'))<CR>gg
-nmap <Leader>sl :call SvnLog(bufname('%'))<CR>gg
-nmap <Leader>si :call SvnInfo(bufname('%'))<CR>gg
-nmap <Leader>sb :call SvnBlame(bufname('%'))<CR>gg
+com Sdiff :call SvnDiff(bufname('%'))
+com Slog :call SvnLog(bufname('%'))
+com Sinfo :call SvnInfo(bufname('%'))
+com Sblame :call SvnBlame(bufname('%'))
 nmap <Leader>sr :call SvnModeDiff(expand('<cword>'))<CR>gg
 
 function SvnDiff(file)
@@ -483,6 +483,7 @@ endfunction
 function SvnInfo(file)
 	let file = SvnModeWindow(a:file)
 	exe "r !svn info ".l:file
+	setlocal filetype=yaml
 endfunction
 function SvnBlame(file)
 	let file = SvnModeWindow(a:file)
@@ -528,11 +529,9 @@ endfunction
 " given a revision string ("r1234" or "1234"), displays diff of that revision
 function SvnModeDiff(rev)
 	if SvnMode()
-		if strpart(a:rev,0,1) == 'r'
-			let num = strpart(a:rev,1)
-		else
-			let num = a:rev
-		endif
+		" extract the rev number from the input
+		let matches = matchlist(a:rev,'[^0-9]*\([0-9]*\)[^0-9]*')
+		let num = get(l:matches,1)
 		let file = SvnModeWindow('')
 		exe "r !svn diff -c ".l:num." ".l:file
 		setl filetype=diff
