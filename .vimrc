@@ -233,11 +233,16 @@ nmap <F8> :call WriteTrace()<CR>
 nmap <F9> :!php --rf <cword><CR>
 " }}}
 " abbreviations {{{
-ab _test print('lbotest: '.rand());//lbotest
+ab function function () {<CR>}<ESC>k^t(i
+ab class class {<CR>}<ESC>k^t{i
+ab interface interface {<CR>}<ESC>k^t{i
+ab if if {<CR>}<ESC>k^t{i
+ab foreach foreach {<CR>}<ESC>k^t{i
+ab while while {<CR>}<ESC>k^t{i
 " }}}
 "{{{ ToggleColumns()
 "make it easy to remove line number column etc. for cross-terminal copy/paste
-function ToggleColumns()
+fun! ToggleColumns()
   if &number
     set nonumber
     set foldcolumn=0
@@ -254,7 +259,7 @@ endfunction
 "}}}
 "{{{ ToggleFoldFuncs()
 "turns on or off folding php functions
-function ToggleFoldFuncs()
+fun! ToggleFoldFuncs()
 	if &foldmethod == "marker"
 		setlocal foldmethod=expr
 		setlocal foldexpr=FoldFuncsExpr(v:lnum)
@@ -262,7 +267,7 @@ function ToggleFoldFuncs()
 		setlocal foldmethod=marker
 	end
 endfunction
-function FoldFuncsExpr(num)
+fun! FoldFuncsExpr(num)
 	"if match(getline(a:num),"function \w+\s?\(") > -1
 	if match(getline(a:num),"function ") > -1
 		return ">1"
@@ -272,7 +277,7 @@ function FoldFuncsExpr(num)
 endfunction
 "}}}
 "WriteTrace() {{{
-function WriteTrace()
+fun! WriteTrace()
 	let lineNum = line('.')
 	let lineFile = bufname('%')
 	let lineVal = getline(lineNum)
@@ -286,7 +291,7 @@ function WriteTrace()
 endfunction
 "}}}
 "{{{CleverTab()
-function! CleverTab()
+fun! CleverTab()
 	if strpart( getline('.'), 0, col('.')-1 ) =~ '^\s*$'
 		return "\<Tab>"
 	else
@@ -307,7 +312,7 @@ let s:loadingsession = 0
 let s:sessionfile = ''
 let s:netrwsort = ''
 autocmd BufRead *.vim call LoadSessionFinish()
-function LoadSession()
+fun! LoadSession()
 	" save current netrw sort sequence
 	let s:netrwsort = g:netrw_sort_sequence
 	" show sessions first, then dirs
@@ -315,7 +320,7 @@ function LoadSession()
 	let s:loadingsession = 1
 	e .
 endfunction
-function LoadSessionFinish()
+fun! LoadSessionFinish()
 	if s:loadingsession == 1
 		let s:loadingsession = 0
 		let s:sessionloaded = 1
@@ -326,7 +331,7 @@ function LoadSessionFinish()
 		source %
 	end
 endfunction
-function SaveSession()
+fun! SaveSession()
   if s:sessionloaded == 1
 		let s:sessionloaded = 0
 		" re-save session before exiting
@@ -343,7 +348,7 @@ if version >= 700
 	autocmd TabEnter *.list call ListFile()
 
 	" 'install' list features
-	function ListFile()
+	fun! ListFile()
 		setlocal foldmethod=expr
 		setlocal foldexpr=ListFoldLevel(v:lnum)
 		setlocal shiftwidth=4
@@ -372,12 +377,12 @@ if version >= 700
 	endfunction
 
 	" return properly formatted timestamp
-	function ListTimestamp()
+	fun! ListTimestamp()
 		return ' ['.strftime('%y-%m-%d %H:%M').']'
 	endfunction
 
 	" return fold line format
-	function ListFoldLine(linenum)
+	fun! ListFoldLine(linenum)
 		let s:count = 1
 		let s:spaces = ''
 		while s:count <= &shiftwidth
@@ -388,7 +393,7 @@ if version >= 700
 	endfunction
 
 	" foldexpr function
-	function ListFoldLevel(linenum)
+	fun! ListFoldLevel(linenum)
 		let s:prefix = ''
 		let s:myline = getline(a:linenum)
 		let s:nextline = getline(a:linenum+1)
@@ -417,7 +422,7 @@ endif
 "}}}
 "{{{ tab stuff
 "tab line
-function MyTabLine()
+fun! MyTabLine()
 	let s = ''
 	for i in range(tabpagenr('$'))
 		" select the highlighting
@@ -439,7 +444,7 @@ function MyTabLine()
 
 	return s
 endfunction
-function MyTabLabel(n)
+fun! MyTabLabel(n)
 	let buflist = tabpagebuflist(a:n)
 	let winnr = tabpagewinnr(a:n)
 	let fullname = bufname(buflist[winnr - 1])
@@ -458,52 +463,52 @@ if version >= 700
 endif
 
 "tab moving
-function MoveTab(n)
+fun! MoveTab(n)
 	let which = tabpagenr()
 	let which = which + a:n
 	exe "tabm ".which
 endfunction
 "}}}
 "svn stuff {{{
-com Sdiff :call SvnDiff(bufname('%'))
-com Slog :call SvnLog(bufname('%'))
-com Sinfo :call SvnInfo(bufname('%'))
-com Sblame :call SvnBlame(bufname('%'))
+com! Sdiff :call SvnDiff(bufname('%'))
+com! Slog :call SvnLog(bufname('%'))
+com! Sinfo :call SvnInfo(bufname('%'))
+com! Sblame :call SvnBlame(bufname('%'))
 nmap <Leader>sr :call SvnModeDiff(expand('<cword>'))<CR>gg
 
-function SvnDiff(file)
+fun! SvnDiff(file)
 	let file = SvnModeWindow(a:file)
 	exe "r !svn diff ".l:file
 	setlocal filetype=diff
 endfunction
-function SvnLog(file)
+fun! SvnLog(file)
 	let file = SvnModeWindow(a:file)
 	exe "r !svn log -v ".l:file
 endfunction
-function SvnInfo(file)
+fun! SvnInfo(file)
 	let file = SvnModeWindow(a:file)
 	exe "r !svn info ".l:file
 	setlocal filetype=yaml
 endfunction
-function SvnBlame(file)
+fun! SvnBlame(file)
 	let file = SvnModeWindow(a:file)
 	exe "r !svn blame ".l:file
 endfunction
-function SvnDiffSplit(path,file)
+fun! SvnDiffSplit(path,file)
 	exe "!svn export -r HEAD ".a:path."/".a:file." ~/tmp/".a:file
 	exe "vert diffsplit ~/tmp/".a:file
 endfunction
 
 " svn mode
 " set svn mode for this window
-function SvnModeSet(file)
+fun! SvnModeSet(file)
 	let w:svnMode = 1
 	let w:svnFile = a:file
 endfunction
 " create new window in svn mode
 " uses given file if current window is not already in svn mode
 " otherwise, closes current window, creates new, sets svnmode on it and returns svnFile from previous window
-function SvnModeWindow(file)
+fun! SvnModeWindow(file)
 	if !SvnMode()
 		tabe
 		let file = a:file
@@ -517,17 +522,17 @@ function SvnModeWindow(file)
 	return l:file
 endfunction
 " are we in svnmode?
-function SvnMode()
+fun! SvnMode()
 	if !exists('w:svnMode') || w:svnMode == 0
 		return 0
 	endif
 	return 1
 endfunction
-function SvnModeError()
+fun! SvnModeError()
 	echo "You're not in SVN mode!"
 endfunction
 " given a revision string ("r1234" or "1234"), displays diff of that revision
-function SvnModeDiff(rev)
+fun! SvnModeDiff(rev)
 	if SvnMode()
 		" extract the rev number from the input
 		let matches = matchlist(a:rev,'[^0-9]*\([0-9]*\)[^0-9]*')
@@ -541,7 +546,7 @@ function SvnModeDiff(rev)
 endfunction
 "}}}
 "{{{ctags stuff
-function CtagsFind(file)
+fun! CtagsFind(file)
 	tabe
 	exe "tj ".a:file
 endfunction
