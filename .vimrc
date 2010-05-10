@@ -159,18 +159,7 @@ set noswapfile
 
 " }}}
 " {{{ filetype dependent
-" dictionary of php function names for c-x-c-k
-"autocmd BufNewFile,BufRead *.php setlocal filetype=php
-autocmd FileType php setlocal dictionary=~/.vim/funclist.txt
-
 autocmd BufNewFile,BufRead *.html setlocal commentstring=<!--%s-->
-" I wanted to start with all folds closed, but vim is slightly retarded:
-" C-r and C-m will always add or subtract from foldlevel, even if there are no more folds to affect,
-" which requires hitting C-m 98 times to close the lowest fold if there are only 2 levels of folds if foldlevelstart=99
-"autocmd FileType php setlocal foldlevelstart=2
-
-"cake's thtml files need syntax highlighting
-autocmd BufNewFile,BufRead *.thtml setlocal filetype=php
 
 " ruby commenstring
 autocmd FileType ruby setlocal commentstring=#%s
