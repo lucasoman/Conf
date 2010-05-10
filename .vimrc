@@ -208,8 +208,6 @@ nmap <Leader>tf :call CtagsFind(expand('<cword>'))<CR>
 nmap <Leader>ts :exe('stj '.expand('<cword>'))<CR>
 " fix a block of XML; inserts newlines, indents properly, folds by indent
 nmap <Leader>fx :setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format -<CR>:setlocal foldmethod=indent<CR>
-" diff stuff
-nmap <Leader>ds :call SvnDiffSplit(expand('%:h'),expand('%:t'))<CR>
 "f keys
 nmap <F2> :call ToggleColumns()<CR>
 imap <F2> <C-o>:call ToggleColumns()<CR>
@@ -281,7 +279,8 @@ endfunction
 "}}}
 "{{{CleverTab()
 fun! CleverTab()
-	if strpart( getline('.'), 0, col('.')-1 ) =~ '^\s*$'
+	let beginning = strpart( getline('.'), 0, col('.')-1 )
+	if l:beginning =~ '^\s*$' || l:beginning =~ '\s$'
 		return "\<Tab>"
 	else
 		return "\<C-N>"
@@ -463,6 +462,7 @@ com! Sdiff :call SvnDiff(bufname('%'))
 com! Slog :call SvnLog(bufname('%'))
 com! Sinfo :call SvnInfo(bufname('%'))
 com! Sblame :call SvnBlame(bufname('%'))
+com! Sdiffs :call SvnDiffSplit(expand('%:h'),expand('%:t'))
 nmap <Leader>sr :call SvnModeDiff(expand('<cword>'))<CR>gg
 
 fun! SvnDiff(file)
