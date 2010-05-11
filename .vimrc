@@ -220,12 +220,12 @@ nmap <F8> :call WriteTrace()<CR>
 nmap <F9> :!php --rf <cword><CR>
 " }}}
 " abbreviations {{{
-ab function function () {<CR>}<ESC>k^t(i
-ab class class {<CR>}<ESC>k^t{i
-ab interface interface {<CR>}<ESC>k^t{i
-ab if if {<CR>}<ESC>k^t{i
-ab foreach foreach {<CR>}<ESC>k^t{i
-ab while while {<CR>}<ESC>k^t{i
+iab function function () {<CR>}<ESC>k^t(i
+iab class class {<CR>}<ESC>k^t{i
+iab interface interface {<CR>}<ESC>k^t{i
+iab if if {<CR>}<ESC>k^t{i
+iab foreach foreach {<CR>}<ESC>k^t{i
+iab while while {<CR>}<ESC>k^t{i
 " }}}
 "{{{ ToggleColumns()
 "make it easy to remove line number column etc. for cross-terminal copy/paste
