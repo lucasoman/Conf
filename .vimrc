@@ -219,6 +219,25 @@ nmap <F7> :!updatedev.php %:p<CR>
 nmap <F8> :call WriteTrace()<CR>
 nmap <F9> :!php --rf <cword><CR>
 " }}}
+" Commands {{{
+" grep for given string (second is case insensitive)
+" eg: :F lib/ BadXMLException
+com! -nargs=+ F :call CommandFind("<args>",0)
+com! -nargs=+ Fi :call CommandFind("<args>",1)
+fun! CommandFind(args,ci)
+	let parts = split(a:args,' ')
+	let path = l:parts[0]
+	call remove(l:parts,0)
+	let search = join(l:parts,' ')
+	tabe
+	set buftype=nofile
+	if a:ci
+		exe "r !grep -rli '".l:search."' ".l:path." | grep -v '.svn'"
+	else
+		exe "r !grep -rl '".l:search."' ".l:path." | grep -v '.svn'"
+	endif
+endfunction
+"}}}
 " abbreviations {{{
 iab function function () {<CR>}<ESC>k^t(i
 iab class class {<CR>}<ESC>k^t{i
