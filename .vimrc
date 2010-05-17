@@ -219,6 +219,15 @@ nmap <F7> :!updatedev.php %:p<CR>
 nmap <F8> :call WriteTrace()<CR>
 nmap <F9> :!php --rf <cword><CR>
 " }}}
+" snippets{{{
+let s:snippets = {}
+let s:snippets['^\s*if$'] = " () {\<CR>}\<ESC>k^f)i" 
+let s:snippets['function$'] = "  () {\<CR>}\<ESC>k^t(i" 
+let s:snippets['^\s*class$'] = "  {\<CR>}\<ESC>kt{i"
+let s:snippets['^\s*interface$'] = "  {\<CR>}\<ESC>kt{i"
+let s:snippets['^\s*foreach$'] = " () {\<CR>}\<ESC>k^f)i" 
+let s:snippets['^\s*while$'] = " () {\<CR>}\<ESC>k^f)i" 
+"}}}
 " Commands {{{
 " grep for given string (second is case insensitive)
 " eg: :F lib/ BadXMLException
@@ -238,14 +247,6 @@ fun! CommandFind(args,ci)
 	endif
 endfunction
 "}}}
-" abbreviations {{{
-iab function function () {<CR>}<ESC>k^t(i
-iab class class {<CR>}<ESC>k^t{i
-iab interface interface {<CR>}<ESC>k^t{i
-iab if if {<CR>}<ESC>k^t{i
-iab foreach foreach {<CR>}<ESC>k^t{i
-iab while while {<CR>}<ESC>k^t{i
-" }}}
 "{{{ ToggleColumns()
 "make it easy to remove line number column etc. for cross-terminal copy/paste
 fun! ToggleColumns()
@@ -299,6 +300,11 @@ endfunction
 "{{{CleverTab()
 fun! CleverTab()
 	let beginning = strpart( getline('.'), 0, col('.')-1 )
+	for key in keys(s:snippets)
+		if l:beginning =~ key
+			return s:snippets[key]
+		endif
+	endfor
 	if l:beginning =~ '^\s*$' || l:beginning =~ '\s$'
 		return "\<Tab>"
 	else
