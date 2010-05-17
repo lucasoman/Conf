@@ -308,7 +308,7 @@ fun! CleverTab()
 	if l:beginning =~ '^\s*$' || l:beginning =~ '\s$'
 		return "\<Tab>"
 	else
-		return "\<C-N>"
+		return "\<C-P>"
 endfunction
 inoremap <Tab> <C-R>=CleverTab()<CR>
 "}}}
