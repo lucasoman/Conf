@@ -1,19 +1,10 @@
-" vim: fdm=marker
-" .vimrc file
+" vim: fdm=marker:commentstring="%s
 " Recommended for vim >= 7, though works with vim 6
-" By Lucas Oman
-" me@lucasoman.com
+" Lucas Oman <me@lucasoman.com>
 " --enable-rubyinterp --prefix=/usr --enable-ruby
-" from: http://github.com/lucasoman/Conf/raw/master/.vimrc
+" Get latest from: http://github.com/lucasoman/Conf/raw/master/.vimrc
 
-set nocompatible
-syntax on
-filetype on
-"filetype plugin on
-
-" fast terminal for smoother redrawing
-set ttyfast
-
+" misc options
 " {{{ interface
 " lines, cols in status line
 set ruler
@@ -64,42 +55,15 @@ set cursorcolumn
 "set statusline=%<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P
 "set laststatus=2
 " }}}
-" {{{ colors
-" tabe line colors
-highlight TabLineFill ctermfg=DarkGray
-highlight TabLine ctermfg=7 ctermbg=DarkGray cterm=none
-highlight TabLineSel ctermfg=7 cterm=bold ctermbg=DarkGray
-
-" number column colors
-highlight LineNr cterm=bold ctermbg=DarkGray cterm=none ctermfg=4
-
-" fold colors
-highlight Folded cterm=bold ctermbg=DarkGray cterm=none ctermfg=4
-highlight FoldColumn cterm=bold ctermbg=DarkGray cterm=none ctermfg=4
-
-" visual mode colors
-highlight Visual ctermbg=7 ctermfg=4
-
-" dictionary menu colors
-highlight Pmenu ctermbg=7 ctermfg=0
-highlight PmenuSel ctermbg=Yellow ctermfg=0
-
-" diff colors
-highlight DiffAdd cterm=none ctermbg=DarkGray
-highlight DiffDelete cterm=none ctermbg=DarkGray
-highlight DiffChange cterm=none ctermbg=none
-highlight DiffText cterm=none ctermbg=DarkGray
-
-" keep cursor column last so it overrides all others
-highlight CursorColumn cterm=bold ctermbg=DarkGray cterm=none
-highlight CursorLine cterm=bold ctermbg=DarkGray cterm=none
-
-highlight Search cterm=none ctermbg=7 ctermfg=4
-
-" the dark colors kill my eyes
-set background=light
-" }}}
 " {{{ behavior
+set nocompatible
+syntax on
+filetype on
+"filetype plugin on
+
+" fast terminal for smoother redrawing
+set ttyfast
+
 set omnifunc=syntaxcomplete#Complete
 
 set shiftwidth=2
@@ -138,13 +102,6 @@ set ignorecase smartcase
 " turn off bells, change to screen flash
 set visualbell
 
-" gf should use new tab, not current buffer
-if version >= 700
-	map gf :tabe <cfile><CR>
-else
-	map gf :bad <cfile><CR>
-endif
-
 " show our whitespace
 " alternate character: »
 "not a big fan of this; will keep just in case
@@ -158,6 +115,41 @@ set wildmode=longest,list
 set noswapfile
 
 " }}}
+" {{{ colors
+" tabe line colors
+highlight TabLineFill ctermfg=DarkGray
+highlight TabLine ctermfg=7 ctermbg=DarkGray cterm=none
+highlight TabLineSel ctermfg=7 cterm=bold ctermbg=DarkGray
+
+" number column colors
+highlight LineNr cterm=bold ctermbg=DarkGray cterm=none ctermfg=4
+
+" fold colors
+highlight Folded cterm=bold ctermbg=DarkGray cterm=none ctermfg=4
+highlight FoldColumn cterm=bold ctermbg=DarkGray cterm=none ctermfg=4
+
+" visual mode colors
+highlight Visual ctermbg=7 ctermfg=4
+
+" dictionary menu colors
+highlight Pmenu ctermbg=7 ctermfg=0
+highlight PmenuSel ctermbg=Yellow ctermfg=0
+
+" diff colors
+highlight DiffAdd cterm=none ctermbg=DarkGray
+highlight DiffDelete cterm=none ctermbg=DarkGray
+highlight DiffChange cterm=none ctermbg=none
+highlight DiffText cterm=none ctermbg=DarkGray
+
+" keep cursor column last so it overrides all others
+highlight CursorColumn cterm=bold ctermbg=DarkGray cterm=none
+highlight CursorLine cterm=bold ctermbg=DarkGray cterm=none
+
+highlight Search cterm=none ctermbg=7 ctermfg=4
+
+" the dark colors kill my eyes
+set background=light
+" }}}
 " {{{ filetype dependent
 autocmd BufNewFile,BufRead *.html setlocal commentstring=<!--%s-->
 
@@ -166,23 +158,27 @@ autocmd FileType ruby setlocal commentstring=#%s
 
 autocmd FileTYpe python setlocal nocindent autoindent
 "}}}
-" {{{ mapped shortcuts
+"php syntax options {{{
+let php_sql_query = 1  "for SQL syntax highlighting inside strings
+let php_htmlInStrings = 1  "for HTML syntax highlighting inside strings
+"php_baselib = 1  "for highlighting baselib functions
+"php_asp_tags = 1  "for highlighting ASP-style short tags
+"php_parent_error_close = 1  "for highlighting parent error ] or )
+"php_parent_error_open = 1  "for skipping an php end tag, if there exists an open ( or [ without a closing one
+"php_oldStyle = 1  "for using old colorstyle
+"php_noShortTags = 1  "don't sync <? ?> as php
+let php_folding = 1  "for folding classes and functions
+" }}}
+"netrw options {{{
+let g:netrw_sort_sequence = '[\/]$,\.php,\.phtml,*,\.info$,\.swp$,\.bak$,\~$'
+"}}}
+
+" mappings
+" {{{ general
 let mapleader = "\\"
-" quicker aliases for navigating tabs
-nmap H gT
-nmap L gt
-nmap <C-l> :call MoveTab(0)<CR>
-nmap <C-h> :call MoveTab(-2)<CR>
 " easier move screen up/down
 nmap <C-j> <C-e>
 nmap <C-k> <C-y>
-" creates a fold from a block of code in {}s
-nmap <Leader>pf $va}zf
-" php syntax check
-nmap <Leader>ps :!php -l %<CR>
-nmap <Leader>pr :!php % \| less -F<CR>
-nmap <Leader>ph :!php --rf <cword><CR>
-nmap <Leader>ff :call ToggleFoldFuncs()<CR>
 " turns of highlighting
 nmap <Leader>/ :nohl<CR>
 " search for highlighted text
@@ -190,66 +186,42 @@ vmap // y/<C-R>"<CR>
 " keep block highlighted when indenting
 vmap >> >gv
 vmap << <gv
-nmap <Leader>l o----------------------------------------------------<CR><ESC>
+" fix a block of XML; inserts newlines, indents properly, folds by indent
+nmap <Leader>fx :setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format -<CR>:setlocal foldmethod=indent<CR>
+" comment/uncomment highlighted block
+vmap <Leader>cc :s!^!//!<CR>
+vmap <Leader>cu :s!^//!!<CR>
+"}}}
+" php {{{
+" syntax check
+nmap <Leader>ps :!php -l %<CR>
+" run current script
+nmap <Leader>pr :!php % \| less -F<CR>
+" lookup keyword in function reference
+nmap <Leader>ph :!php --rf <cword><CR>
 " phpdoc comments
 nmap <Leader>cc o/**<CR>$Rev$<CR>$Date$<CR>$Id$<CR>$Author$<CR>$HeadURL$<CR><CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR><BS>/<ESC>kkk$a 
 nmap <Leader>cb o/**<CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
 nmap <Leader>cv o/**<CR><CR><CR>@var <CR><BS>/<ESC>kkk$a
 nmap <Leader>cp o/**<CR><CR><CR>@author Lucas Oman <me@lucasoman.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
-vmap <Leader>cc :s!^!//!<CR>
-vmap <Leader>cu :s!^//!!<CR>
-" svn
+"}}}
+" svn {{{
 nmap <Leader>sc :!svnconsole.php<CR><CR>
 nmap <Leader>sk :!svn propset svn:keywords "Rev Date Id Author HeadURL" %<CR>
-" Open Current (path)
-nmap <Leader>oc :tabe %:h<CR>
-" ctags
-nmap <Leader>tf :call CtagsFind(expand('<cword>'))<CR>
-nmap <Leader>ts :exe('stj '.expand('<cword>'))<CR>
-" fix a block of XML; inserts newlines, indents properly, folds by indent
-nmap <Leader>fx :setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format -<CR>:setlocal foldmethod=indent<CR>
-"f keys
+"}}}
+"f keys {{{
 nmap <F2> :call ToggleColumns()<CR>
 imap <F2> <C-o>:call ToggleColumns()<CR>
 nmap <F3> :call LoadSession()<CR>
-nmap <F4> :!updater<CR>
 set pastetoggle=<F5>
-nmap <F6> :!updatedev.php<CR>
 nmap <F7> :!updatedev.php %:p<CR>
 nmap <F8> :call WriteTrace()<CR>
-nmap <F9> :!php --rf <cword><CR>
+nmap <F9> \ph
 " }}}
-" snippets{{{
-let s:snippets = {}
-let s:snippets['^\s*if$'] = " () {\<CR>}\<ESC>k^f)i" 
-let s:snippets['function$'] = "  () {\<CR>}\<ESC>k^t(i" 
-let s:snippets['^\s*class$'] = "  {\<CR>}\<ESC>kt{i"
-let s:snippets['^\s*interface$'] = "  {\<CR>}\<ESC>kt{i"
-let s:snippets['^\s*foreach$'] = " () {\<CR>}\<ESC>k^f)i" 
-let s:snippets['^\s*while$'] = " () {\<CR>}\<ESC>k^f)i" 
-"}}}
-" Commands {{{
-" grep for given string (second is case insensitive)
-" eg: :F lib/ BadXMLException
-com! -nargs=+ F :call CommandFind("<args>",0)
-com! -nargs=+ Fi :call CommandFind("<args>",1)
-fun! CommandFind(args,ci)
-	let parts = split(a:args,' ')
-	let path = l:parts[0]
-	call remove(l:parts,0)
-	let search = join(l:parts,' ')
-	tabe
-	set buftype=nofile
-	if a:ci
-		exe "r !grep -rli '".l:search."' ".l:path." | grep -v '.svn'"
-	else
-		exe "r !grep -rl '".l:search."' ".l:path." | grep -v '.svn'"
-	endif
-endfunction
-"}}}
-"{{{ ToggleColumns()
-"make it easy to remove line number column etc. for cross-terminal copy/paste
-fun! ToggleColumns()
+
+" minor helpful stuff
+fun! ToggleColumns() "{{{
+	"make it easy to remove line number column etc. for cross-terminal copy/paste
   if &number
     set nonumber
     set foldcolumn=0
@@ -264,27 +236,7 @@ fun! ToggleColumns()
   end
 endfunction
 "}}}
-"{{{ ToggleFoldFuncs()
-"turns on or off folding php functions
-fun! ToggleFoldFuncs()
-	if &foldmethod == "marker"
-		setlocal foldmethod=expr
-		setlocal foldexpr=FoldFuncsExpr(v:lnum)
-	else
-		setlocal foldmethod=marker
-	end
-endfunction
-fun! FoldFuncsExpr(num)
-	"if match(getline(a:num),"function \w+\s?\(") > -1
-	if match(getline(a:num),"function ") > -1
-		return ">1"
-	else
-		return "="
-	endif
-endfunction
-"}}}
-"WriteTrace() {{{
-fun! WriteTrace()
+fun! WriteTrace() "{{{
 	let lineNum = line('.')
 	let lineFile = bufname('%')
 	let lineVal = getline(lineNum)
@@ -297,7 +249,28 @@ fun! WriteTrace()
 	call writefile(allLines,$HOME."/trace.txt")
 endfunction
 "}}}
-"{{{CleverTab()
+"{{{ctags stuff
+nmap <Leader>tf :call CtagsFind(expand('<cword>'))<CR>
+" split window and search for tag
+nmap <Leader>ts :exe('stj '.expand('<cword>'))<CR>
+
+" open new tab and search for tag
+fun! CtagsFind(keyword)
+	tabe
+	exe "tj ".a:keyword
+endfunction
+"}}}
+
+" stand-alone components
+"{{{ TAB-COMPLETE and SNIPPETS
+let s:snippets = {}
+let s:snippets['^\s*if$'] = " () {\<CR>}\<ESC>k^f)i" 
+let s:snippets['function$'] = "  () {\<CR>}\<ESC>k^t(i" 
+let s:snippets['^\s*class$'] = "  {\<CR>}\<ESC>kt{i"
+let s:snippets['^\s*interface$'] = "  {\<CR>}\<ESC>kt{i"
+let s:snippets['^\s*foreach$'] = " () {\<CR>}\<ESC>k^f)i" 
+let s:snippets['^\s*while$'] = " () {\<CR>}\<ESC>k^f)i" 
+
 fun! CleverTab()
 	let beginning = strpart( getline('.'), 0, col('.')-1 )
 	for key in keys(s:snippets)
@@ -308,11 +281,11 @@ fun! CleverTab()
 	if l:beginning =~ '^\s*$' || l:beginning =~ '\s$'
 		return "\<Tab>"
 	else
-		return "\<C-P>"
+		return "\<C-N>"
 endfunction
 inoremap <Tab> <C-R>=CleverTab()<CR>
 "}}}
-"{{{ session stuff
+"{{{ SESSION MGMT
 " don't store any options in sessions
 if version >= 700
 	" localoptions has to be here:
@@ -353,11 +326,9 @@ fun! SaveSession()
 endfunction
 autocmd VimLeave * call SaveSession()
 " }}}
-"{{{ list stuff
+"{{{ LIST FILES
 if version >= 700
-	"autocmd BufNewFile,BufRead *.list highlight CursorLine NONE
 	autocmd BufNewFile,BufRead *.list call ListFile()
-	"autocmd TabLeave *.list highlight CursorLine cterm=bold ctermbg=0 cterm=none
 	autocmd TabEnter *.list call ListFile()
 
 	" 'install' list features
@@ -433,61 +404,13 @@ if version >= 700
 	endfunction
 endif
 "}}}
-"{{{ tab stuff
-"tab line
-fun! MyTabLine()
-	let s = ''
-	for i in range(tabpagenr('$'))
-		" select the highlighting
-		if i + 1 == tabpagenr()
-			let s .= '%#TabLineSel#'
-		else
-			let s .= '%#TabLine#'
-		endif
-
-		" set the tab page number (for mouse clicks)
-		let s .= '%' . (i + 1) . 'T'.(i+1).''
-
-		" the filename is made by MyTabLabel()
-		let s .= '%{MyTabLabel(' . (i + 1) . ')}  '
-	endfor
-
-	" after the last tab fill with TabLineFill and reset tab page nr
-	let s .= '%#TabLineFill#%T'
-
-	return s
-endfunction
-fun! MyTabLabel(n)
-	let buflist = tabpagebuflist(a:n)
-	let winnr = tabpagewinnr(a:n)
-	let fullname = bufname(buflist[winnr - 1])
-	"let fullname = substitute(fullname,"(\w){1}\w*/","\1/","g")
-	let fullname = substitute(fullname,".*/","","")
-	if getbufvar(buflist[winnr - 1],"&mod")
-		let modified = "+"
-	else
-		let modified = " "
-	endif
-	return modified.fullname
-endfunction
-if version >= 700
-	" Use the above tabe naming scheme
-	set tabline=%!MyTabLine()
-endif
-
-"tab moving
-fun! MoveTab(n)
-	let which = tabpagenr()
-	let which = which + a:n
-	exe "tabm ".which
-endfunction
-"}}}
-"svn stuff {{{
+"SUBVERSION {{{
 com! Sdiff :call SvnDiff(bufname('%'))
 com! Slog :call SvnLog(bufname('%'))
 com! Sinfo :call SvnInfo(bufname('%'))
 com! Sblame :call SvnBlame(bufname('%'))
 com! Sdiffs :call SvnDiffSplit(expand('%:h'),expand('%:t'))
+" view diff for file at revision under cursor
 nmap <Leader>sr :call SvnModeDiff(expand('<cword>'))<CR>gg
 
 fun! SvnDiff(file)
@@ -559,23 +482,87 @@ fun! SvnModeDiff(rev)
 	endif
 endfunction
 "}}}
-"{{{ctags stuff
-fun! CtagsFind(file)
+"CODE GREP {{{
+" grep for given string (second is case insensitive)
+" eg: :F lib/ BadXMLException
+com! -nargs=+ F :call CommandFind("<args>",0)
+com! -nargs=+ Fi :call CommandFind("<args>",1)
+fun! CommandFind(args,ci)
+	let parts = split(a:args,' ')
+	let path = l:parts[0]
+	call remove(l:parts,0)
+	let search = join(l:parts,' ')
 	tabe
-	exe "tj ".a:file
+	set buftype=nofile
+	if a:ci
+		exe "r !grep -rli '".l:search."' ".l:path." | grep -v '.svn'"
+	else
+		exe "r !grep -rl '".l:search."' ".l:path." | grep -v '.svn'"
+	endif
 endfunction
 "}}}
-"php syntax options {{{
-let php_sql_query = 1  "for SQL syntax highlighting inside strings
-let php_htmlInStrings = 1  "for HTML syntax highlighting inside strings
-"php_baselib = 1  "for highlighting baselib functions
-"php_asp_tags = 1  "for highlighting ASP-style short tags
-"php_parent_error_close = 1  "for highlighting parent error ] or )
-"php_parent_error_open = 1  "for skipping an php end tag, if there exists an open ( or [ without a closing one
-"php_oldStyle = 1  "for using old colorstyle
-"php_noShortTags = 1  "don't sync <? ?> as php
-let php_folding = 1  "for folding classes and functions
-" }}}
-" netrw {{{
-let g:netrw_sort_sequence = '[\/]$,\.php,\.phtml,*,\.info$,\.swp$,\.bak$,\~$'
+"{{{ TAB MGMT
+" Open Current (path)
+nmap <Leader>oc :tabe %:h<CR>
+
+" quicker aliases for navigating tabs
+nmap H gT
+nmap L gt
+nmap <C-l> :call MoveTab(0)<CR>
+nmap <C-h> :call MoveTab(-2)<CR>
+
+" gf should use new tab, not current buffer
+if version >= 700
+	map gf :tabe <cfile><CR>
+else
+	map gf :bad <cfile><CR>
+endif
+
+"tab line
+fun! MyTabLine()
+	let s = ''
+	for i in range(tabpagenr('$'))
+		" select the highlighting
+		if i + 1 == tabpagenr()
+			let s .= '%#TabLineSel#'
+		else
+			let s .= '%#TabLine#'
+		endif
+		" set the tab page number (for mouse clicks)
+		let s .= '%' . (i + 1) . 'T'.(i+1).''
+		" the filename is made by MyTabLabel()
+		let s .= '%{MyTabLabel(' . (i + 1) . ')}  '
+	endfor
+	" after the last tab fill with TabLineFill and reset tab page nr
+	let s .= '%#TabLineFill#%T'
+	return s
+endfunction
+
+fun! MyTabLabel(n)
+	let buflist = tabpagebuflist(a:n)
+	let winnr = tabpagewinnr(a:n)
+	let fullname = bufname(buflist[winnr - 1])
+	" show a/b/c/filename.ext
+	"let fullname = substitute(fullname,"(\w){1}\w*/","\1/","g")
+	" show filename.ext
+	let fullname = substitute(fullname,".*/","","")
+	if getbufvar(buflist[winnr - 1],"&mod")
+		let modified = "+"
+	else
+		let modified = " "
+	endif
+	return modified.fullname
+endfunction
+
+if version >= 700
+	" Use the above tabe naming scheme
+	set tabline=%!MyTabLine()
+endif
+
+"tab moving
+fun! MoveTab(n)
+	let which = tabpagenr()
+	let which = which + a:n
+	exe "tabm ".which
+endfunction
 "}}}
