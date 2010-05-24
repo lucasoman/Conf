@@ -263,6 +263,8 @@ endfunction
 
 " stand-alone components
 "{{{ TAB-COMPLETE and SNIPPETS
+" add new snippets as regex=>completion
+" first match encountered is used
 let s:snippets = {}
 let s:snippets['^\s*if$'] = " () {\<CR>}\<ESC>k^f)i" 
 let s:snippets['function$'] = "  () {\<CR>}\<ESC>k^t(i" 
@@ -271,6 +273,10 @@ let s:snippets['^\s*interface$'] = "  {\<CR>}\<ESC>kt{i"
 let s:snippets['^\s*foreach$'] = " () {\<CR>}\<ESC>k^f)i" 
 let s:snippets['^\s*while$'] = " () {\<CR>}\<ESC>k^f)i" 
 
+" when tab is pressed:
+" 1) checks snippets for matches, return match if there is one
+" 2) if character behind cursor is whitespace, just return a tab
+" 3) otherwise, try to ctrl-p complete
 fun! CleverTab()
 	let beginning = strpart( getline('.'), 0, col('.')-1 )
 	for key in keys(s:snippets)
@@ -278,15 +284,14 @@ fun! CleverTab()
 			return s:snippets[key]
 		endif
 	endfor
-	if l:beginning =~ '^\s*$' || l:beginning =~ '\s$'
+	if l:beginning =~ '\s$'
 		return "\<Tab>"
 	else
-		return "\<C-N>"
+		return "\<C-P>"
 endfunction
 inoremap <Tab> <C-R>=CleverTab()<CR>
 "}}}
 "{{{ SESSION MGMT
-" don't store any options in sessions
 if version >= 700
 	" localoptions has to be here:
 	" for some reason, new session loading code fails to set filetype of files in session
@@ -298,6 +303,7 @@ let s:loadingsession = 0
 let s:sessionfile = ''
 let s:netrwsort = ''
 autocmd BufRead *.vim call LoadSessionFinish()
+" open current dir to select a session file
 fun! LoadSession()
 	" save current netrw sort sequence
 	let s:netrwsort = g:netrw_sort_sequence
@@ -306,6 +312,7 @@ fun! LoadSession()
 	let s:loadingsession = 1
 	e .
 endfunction
+" we've selected a file, so load it
 fun! LoadSessionFinish()
 	if s:loadingsession == 1
 		let s:loadingsession = 0
@@ -317,6 +324,7 @@ fun! LoadSessionFinish()
 		source %
 	end
 endfunction
+" save the session (if one was loaded) when exiting
 fun! SaveSession()
   if s:sessionloaded == 1
 		let s:sessionloaded = 0
@@ -508,6 +516,7 @@ nmap <Leader>oc :tabe %:h<CR>
 " quicker aliases for navigating tabs
 nmap H gT
 nmap L gt
+" move tab left or right
 nmap <C-l> :call MoveTab(0)<CR>
 nmap <C-h> :call MoveTab(-2)<CR>
 
