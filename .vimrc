@@ -251,6 +251,7 @@ endfunction
 "}}}
 "{{{ctags stuff
 nmap <Leader>tf :call CtagsFind(expand('<cword>'))<CR>
+com! -nargs=+ Tf :call CtagsFind("<args>")
 " split window and search for tag
 nmap <Leader>ts :exe('stj '.expand('<cword>'))<CR>
 
@@ -292,6 +293,8 @@ endfunction
 inoremap <Tab> <C-R>=CleverTab()<CR>
 "}}}
 "{{{ SESSION MGMT
+nmap <Leader>nf :call WhichSession()<CR>
+
 if version >= 700
 	" localoptions has to be here:
 	" for some reason, new session loading code fails to set filetype of files in session
@@ -303,6 +306,7 @@ let s:loadingsession = 0
 let s:sessionfile = ''
 let s:netrwsort = ''
 autocmd BufRead *.vim call LoadSessionFinish()
+autocmd VimLeave * call SaveSession()
 " open current dir to select a session file
 fun! LoadSession()
 	" save current netrw sort sequence
@@ -327,12 +331,14 @@ endfunction
 " save the session (if one was loaded) when exiting
 fun! SaveSession()
   if s:sessionloaded == 1
-		let s:sessionloaded = 0
 		" re-save session before exiting
     exe "mksession! ".s:sessionfile
   end
 endfunction
-autocmd VimLeave * call SaveSession()
+" print which session file is being used
+fun! WhichSession()
+	echo "Session: ".s:sessionfile
+endfunction
 " }}}
 "{{{ LIST FILES
 if version >= 700
