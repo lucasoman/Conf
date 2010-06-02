@@ -285,7 +285,7 @@ fun! CleverTab()
 			return s:snippets[key]
 		endif
 	endfor
-	if l:beginning =~ '\s$'
+	if l:beginning =~ '^\s*$' || l:beginning =~ '\s$'
 		return "\<Tab>"
 	else
 		return "\<C-P>"
@@ -460,6 +460,10 @@ endfunction
 " uses given file if current window is not already in svn mode
 " otherwise, closes current window, creates new, sets svnmode on it and returns svnFile from previous window
 fun! SvnModeWindow(file)
+	let which = tabpagenr()
+	if (l:which > 0)
+		let which = l:which - 1
+	endif
 	if !SvnMode()
 		tabe
 		let file = a:file
@@ -468,6 +472,7 @@ fun! SvnModeWindow(file)
 		exe "q!"
 		tabe
 	endif
+	exe('tabm '.l:which)
 	setl buftype=nofile
 	call SvnModeSet(l:file)
 	return l:file
