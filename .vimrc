@@ -21,12 +21,12 @@ set showcmd
 " current mode in status line
 set showmode
 
-" max items in insert menu
+" max items in popup menu
 if version >= 700
   set pumheight=8
 endif
 
-" number column
+" show number column
 set number
 if version >= 700
   set numberwidth=3
@@ -36,7 +36,7 @@ end
 set foldcolumn=2
 set foldmethod=marker
 
-" line numbering
+" indicate when a line is wrapped by prefixing wrapped line with '> '
 set showbreak=>\ 
 
 " always show tab line
@@ -293,6 +293,12 @@ endfunction
 inoremap <Tab> <C-R>=CleverTab()<CR>
 "}}}
 "{{{ SESSION MGMT
+" Allows you to manage multiple session files for different projects.
+" Use vim's :mksession [filename] command to create a session.
+" Commands and shortcuts:
+" \nf - display currently loaded session file
+" F3 - load session file
+
 nmap <Leader>nf :call WhichSession()<CR>
 
 if version >= 700
@@ -341,6 +347,18 @@ fun! WhichSession()
 endfunction
 " }}}
 "{{{ LIST FILES
+" Creates and maintains text files of nested lists.
+" File must end in '.list'.
+" Use >> and << to adjust depth of item.
+" Includes nested folding for lists.
+" Commands and shortcuts:
+" ,n - create new item
+" ,p - item in progress
+" ,x - item completed
+" ,o - mark item with 'o'
+" ,- - reset item as uncomplete
+" ,N - set priority as N, where N is 1-5
+" ,t - update timestamp on item
 if version >= 700
 	autocmd BufNewFile,BufRead *.list call ListFile()
 	autocmd TabEnter *.list call ListFile()
@@ -419,6 +437,17 @@ if version >= 700
 endif
 "}}}
 "SUBVERSION {{{
+" Adds some cooperation with SVN working copies to vim.
+" Introduces the idea of 'SVN Mode' - once an SVN tab is opened by one of the commands, that tab is in SVN Mode for that file. Executing another such command in that tab will act as if executed in the tab for that file. Handy for jumping back and forth between svn log, revision diffs, etc.
+" 	For example: execute :Slog, which opens a tab containing the log for that file. Put cursor over a revision number in the log, hit \sr. Diff of that revision will appear in the same tab. Execute :Slog again to return to the log.
+" Commands and shortcuts:
+" :Sdiff - show svn diff of current file
+" :Slog - show svn log of current file
+" :Sinfo - show svn info of current file
+" :Sblame - show svn blame of current file
+" :Sdiffs - do a diffsplit of current file with HEAD version (very handy for refactoring)
+" \sr - show diff for file for revision under cursor.
+" 	For example, execute :Slog for a file, put cursor over 'r1234' in the log, and hit \sr
 com! Sdiff :call SvnDiff(bufname('%'))
 com! Slog :call SvnLog(bufname('%'))
 com! Sinfo :call SvnInfo(bufname('%'))
@@ -504,6 +533,7 @@ endfunction
 "CODE GREP {{{
 " grep for given string (second is case insensitive)
 " eg: :F lib/ BadXMLException
+"     :Fi lib/ badxmlexception
 com! -nargs=+ F :call CommandFind("<args>",0)
 com! -nargs=+ Fi :call CommandFind("<args>",1)
 fun! CommandFind(args,ci)
@@ -521,7 +551,16 @@ fun! CommandFind(args,ci)
 endfunction
 "}}}
 "{{{ TAB MGMT
+" Some useful bits for managing tabs.
+" Also changes format of tab line.
+" Commands and shortcuts:
+" \oc - open dir of current file in new tab
+" H - navigate to tab to the left
+" L - navigate to tab to the right
+" C-l - move current tab left
+" C-h - move current tab right
 " Open Current (path)
+" gf - changes default behavior from opening file under cursor in current window to opening in new tab
 nmap <Leader>oc :tabe %:h<CR>
 
 " quicker aliases for navigating tabs
