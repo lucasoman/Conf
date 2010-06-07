@@ -191,6 +191,8 @@ nmap <Leader>fx :setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format
 " comment/uncomment highlighted block
 vmap <Leader>cc :s!^!//!<CR>
 vmap <Leader>cu :s!^//!!<CR>
+" open local projects list file
+nmap <Leader>l :split ~/projects.list<CR>
 "}}}
 " php {{{
 " syntax check
@@ -373,23 +375,23 @@ if version >= 700
 		setlocal noshowmatch
 		setlocal cindent
 		" add [n]ew item below current
-		map <buffer> ,n o- <C-R>=ListTimestamp()<CR><ESC>^la
+		nmap <buffer> ,n o- <C-R>=ListTimestamp()<CR><ESC>^la
 		" mark item as [x]
-		map <buffer> ,x mz^rxf[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,x mz^rxf[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
 		" mark item as [-]
-		map <buffer> ,- mz^r-f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,- mz^r-f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
 		" mark item as = (in [p]rogress)
-		map <buffer> ,p mz^r=f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,p mz^r=f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
 		" mark item as [o]
-		map <buffer> ,o mz^rof[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,o mz^rof[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
 		" mark item with a rank
-		map <buffer> ,1 mz^r1f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
-		map <buffer> ,2 mz^r2f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
-		map <buffer> ,3 mz^r3f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
-		map <buffer> ,4 mz^r4f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
-		map <buffer> ,5 mz^r5f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,1 mz^r1f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,2 mz^r2f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,3 mz^r3f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,4 mz^r4f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,5 mz^r5f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
 		" add/update [t]imestamp
-		map <buffer> ,t mz$a [<ESC>^f[hd$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,t mz$a [<ESC>^f[hd$a<C-R>=ListTimestamp()<CR><ESC>`z
 	endfunction
 
 	" return properly formatted timestamp
