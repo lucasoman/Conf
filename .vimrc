@@ -192,7 +192,7 @@ nmap <Leader>fx :setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format
 vmap <Leader>cc :s!^!//!<CR>
 vmap <Leader>cu :s!^//!!<CR>
 " open local projects list file
-nmap <Leader>l :split ~/projects.list<CR>
+nmap <Leader>l :60vsplit ~/projects.list<CR>
 "}}}
 " php {{{
 " syntax check
