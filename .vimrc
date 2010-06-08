@@ -13,7 +13,8 @@ set rulerformat=%=%h%m%r%w\ %(%c%V%),%l/%L\ %P
 " a - terse messages (like [+] instead of [Modified]
 " t - truncate file names
 " I - no intro message when starting vim fileless
-set shortmess=atI
+" T - truncate long messages to avoid having to hit a key
+set shortmess=atTI
 
 " display the number of (characters|lines) in visual mode, also cur command
 set showcmd
@@ -152,11 +153,12 @@ set background=light
 " }}}
 " {{{ filetype dependent
 autocmd BufNewFile,BufRead *.html setlocal commentstring=<!--%s-->
-
 " ruby commenstring
 autocmd FileType ruby setlocal commentstring=#%s
-
 autocmd FileTYpe python setlocal nocindent autoindent
+" make help navigation easier
+autocmd FileType help nnoremap <buffer> <CR> <C-]>
+autocmd FileType help nnoremap <buffer> <BS> <C-T>
 "}}}
 "php syntax options {{{
 let php_sql_query = 1  "for SQL syntax highlighting inside strings
@@ -187,12 +189,14 @@ vmap // y/<C-R>"<CR>
 vmap >> >gv
 vmap << <gv
 " fix a block of XML; inserts newlines, indents properly, folds by indent
-nmap <Leader>fx :setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format -<CR>:setlocal foldmethod=indent<CR>
+nmap <Leader>fx :setlocal filetype=xml<CR>:%s/\r//g<CR>:%s/\n//g<CR>:%s/></>\r</g<CR>:1,$!xmllint --format -<CR>:setlocal foldmethod=indent<CR>
 " comment/uncomment highlighted block
 vmap <Leader>cc :s!^!//!<CR>
 vmap <Leader>cu :s!^//!!<CR>
 " open local projects list file
 nmap <Leader>l :60vsplit ~/projects.list<CR>
+" fix syntax highlighting
+nmap <Leader>ss :syntax sync fromstart<CR>
 "}}}
 " php {{{
 " syntax check
