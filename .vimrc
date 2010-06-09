@@ -359,6 +359,7 @@ endfunction
 " Includes nested folding for lists.
 " Commands and shortcuts:
 " ,n - create new item
+" ,s - create sub item
 " ,p - item in progress
 " ,x - item completed
 " ,o - mark item with 'o'
@@ -380,6 +381,8 @@ if version >= 700
 		setlocal cindent
 		" add [n]ew item below current
 		nmap <buffer> ,n o- <C-R>=ListTimestamp()<CR><ESC>^la
+		" add new sub item below current
+		nmap <buffer> ,s o- <C-R>=ListTimestamp()<CR><ESC>>>^la
 		" mark item as [x]
 		nmap <buffer> ,x mz^rxf[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
 		" mark item as [-]
@@ -469,6 +472,7 @@ fun! SvnDiff(file)
 endfunction
 fun! SvnLog(file)
 	let file = SvnModeWindow(a:file)
+	setfiletype svnlog
 	exe "r !svn log -v ".l:file
 endfunction
 fun! SvnInfo(file)
