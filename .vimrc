@@ -67,13 +67,13 @@ set ttyfast
 
 set omnifunc=syntaxcomplete#Complete
 
+" indentation options
+" Note: smartindent is seriously outdated. cindent, even, is unnecessary.
+" Let the filetype plugins do the work.
 set shiftwidth=2
 set tabstop=2
-set cindent
-
-" turn off auto-wrap in all cases.
-" let's see what happens with below formatoptions
-" set tw=0
+filetype indent on
+set autoindent
 
 " show matching enclosing chars for .1 sec
 set showmatch
@@ -155,7 +155,6 @@ set background=light
 autocmd BufNewFile,BufRead *.html setlocal commentstring=<!--%s-->
 " ruby commenstring
 autocmd FileType ruby setlocal commentstring=#%s
-autocmd FileTYpe python setlocal nocindent autoindent
 " make help navigation easier
 autocmd FileType help nnoremap <buffer> <CR> <C-]>
 autocmd FileType help nnoremap <buffer> <BS> <C-T>
@@ -189,7 +188,7 @@ vmap // y/<C-R>"<CR>
 vmap >> >gv
 vmap << <gv
 " fix a block of XML; inserts newlines, indents properly, folds by indent
-nmap <Leader>fx :setlocal filetype=xml<CR>:%s/\r//g<CR>:%s/\n//g<CR>:%s/></>\r</g<CR>:1,$!xmllint --format -<CR>:setlocal foldmethod=indent<CR>
+nmap <Leader>fx :setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format -<CR>:setlocal foldmethod=indent<CR>
 " comment/uncomment highlighted block
 vmap <Leader>cc :s!^!//!<CR>
 vmap <Leader>cu :s!^//!!<CR>
