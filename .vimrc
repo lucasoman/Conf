@@ -72,8 +72,9 @@ set omnifunc=syntaxcomplete#Complete
 " Let the filetype plugins do the work.
 set shiftwidth=2
 set tabstop=2
-filetype indent on
+"filetype indent on
 set autoindent
+set cindent
 
 " show matching enclosing chars for .1 sec
 set showmatch
@@ -204,6 +205,8 @@ nmap <Leader>ps :!php -l %<CR>
 nmap <Leader>pr :!php % \| less -F<CR>
 " lookup keyword in function reference
 nmap <Leader>ph :!php --rf <cword><CR>
+" create test method
+nmap <Leader>pt o<CR>/**<CR>@test<CR>/<CR>public function<TAB>
 " phpdoc comments
 nmap <Leader>cc o/**<CR>$Rev$<CR>$Date$<CR>$Id$<CR>$Author$<CR>$HeadURL$<CR><CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR><BS>/<ESC>kkk$a 
 nmap <Leader>cb o/**<CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
@@ -273,7 +276,7 @@ endfunction
 " first match encountered is used
 let s:snippets = {}
 let s:snippets['^\s*if$'] = " () {\<CR>}\<ESC>k^f)i" 
-let s:snippets['function$'] = "  () {\<CR>}\<ESC>k^t(i" 
+let s:snippets['function$'] = " () {\<CR>}\<ESC>k^f(i" 
 let s:snippets['^\s*class$'] = "  {\<CR>}\<ESC>kt{i"
 let s:snippets['^\s*interface$'] = "  {\<CR>}\<ESC>kt{i"
 let s:snippets['^\s*foreach$'] = " () {\<CR>}\<ESC>k^f)i" 
