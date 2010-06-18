@@ -210,7 +210,7 @@ nmap <Leader>pt o<CR>/**<CR>@test<CR>/<CR>public function<TAB>
 " phpdoc comments
 nmap <Leader>cc o/**<CR>$Rev$<CR>$Date$<CR>$Id$<CR>$Author$<CR>$HeadURL$<CR><CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR><BS>/<ESC>kkk$a 
 nmap <Leader>cb o/**<CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
-nmap <Leader>cv o/**<CR><CR><CR>@var <CR><BS>/<ESC>kkk$a
+nmap <Leader>cv o/**<CR><CR><CR>@var <CR><BS>/<ESC>kkk$a 
 nmap <Leader>cp o/**<CR><CR><CR>@author Lucas Oman <me@lucasoman.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
 "}}}
 " svn {{{
