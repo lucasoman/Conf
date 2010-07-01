@@ -367,7 +367,7 @@ endfunction
 " ,o - mark item with 'o'
 " ,- - reset item as uncomplete
 " ,N - set priority as N, where N is 1-5
-" ,t - update timestamp on item
+" ,t - add/update timestamp on item
 if version >= 700
 	autocmd BufNewFile,BufRead *.list call ListFile()
 	autocmd TabEnter *.list call ListFile()
@@ -382,30 +382,45 @@ if version >= 700
 		setlocal noshowmatch
 		setlocal cindent
 		" add [n]ew item below current
-		nmap <buffer> ,n o- <C-R>=ListTimestamp()<CR><ESC>^la
+		"nmap <buffer> ,n o-  [<ESC>:call ListTimestamp()<CR><ESC>^la
+		nmap <buffer> ,n o- 
 		" add new sub item below current
-		nmap <buffer> ,s o- <C-R>=ListTimestamp()<CR><ESC>>>^la
+		"nmap <buffer> ,s o-  [<ESC>:call ListTimestamp()<CR><ESC>>>^la
+		nmap <buffer> ,s o- 
 		" mark item as [x]
-		nmap <buffer> ,x mz^rxf[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,x mz^rx:call ListTimestamp()<CR><ESC>`z
 		" mark item as [-]
-		nmap <buffer> ,- mz^r-f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,- mz^r-:call ListTimestamp()<CR><ESC>`z
 		" mark item as = (in [p]rogress)
-		nmap <buffer> ,p mz^r=f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,p mz^r=:call ListTimestamp()<CR><ESC>`z
 		" mark item as [o]
-		nmap <buffer> ,o mz^rof[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,o mz^ro:call ListTimestamp()<CR><ESC>`z
 		" mark item with a rank
-		nmap <buffer> ,1 mz^r1f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
-		nmap <buffer> ,2 mz^r2f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
-		nmap <buffer> ,3 mz^r3f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
-		nmap <buffer> ,4 mz^r4f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
-		nmap <buffer> ,5 mz^r5f[hdf]$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,1 mz^r1:call ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,2 mz^r2:call ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,3 mz^r3:call ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,4 mz^r4:call ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,5 mz^r5:call ListTimestamp()<CR><ESC>`z
 		" add/update [t]imestamp
-		nmap <buffer> ,t mz$a [<ESC>^f[hd$a<C-R>=ListTimestamp()<CR><ESC>`z
+		nmap <buffer> ,t mz$a [<ESC>:call ListTimestamp()<CR><ESC>`z
 	endfunction
 
-	" return properly formatted timestamp
+	" fix properly formatted timestamp
 	fun! ListTimestamp()
-		return ' ['.strftime('%y-%m-%d %H:%M').']'
+		let addStamp = 0
+		if getline('.') =~ '\['
+			let addStamp = 1
+		endif
+		normal ^t[d$
+		if l:addStamp
+			call ListTimestampString()
+			normal "zp
+		endif
+	endfunction
+
+	" return actual timestamp string
+	fun! ListTimestampString()
+		let @z = ' ['.strftime('%y-%m-%d %H:%M').']'
 	endfunction
 
 	" return fold line format
