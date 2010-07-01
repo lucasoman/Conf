@@ -120,8 +120,8 @@ set noswapfile
 " {{{ colors
 " tabe line colors
 highlight TabLineFill ctermfg=DarkGray
-highlight TabLine ctermfg=7 ctermbg=DarkGray cterm=none
-highlight TabLineSel ctermfg=7 cterm=bold ctermbg=DarkGray
+highlight TabLine ctermfg=4 ctermbg=DarkGray cterm=bold
+highlight TabLineSel ctermfg=7 cterm=none ctermbg=DarkGray
 
 " number column colors
 highlight LineNr cterm=bold ctermbg=DarkGray cterm=none ctermfg=4
@@ -149,8 +149,8 @@ highlight CursorLine cterm=bold ctermbg=DarkGray cterm=none
 
 highlight Search cterm=none ctermbg=7 ctermfg=4
 
-" the dark colors kill my eyes
-set background=light
+" make sure bold is disabled or your terminal will look like the vegas strip
+set background=dark
 " }}}
 " {{{ filetype dependent
 autocmd BufNewFile,BufRead *.html setlocal commentstring=<!--%s-->
@@ -452,33 +452,45 @@ endif
 " Introduces the idea of 'SVN Mode' - once an SVN tab is opened by one of the commands, that tab is in SVN Mode for that file. Executing another such command in that tab will act as if executed in the tab for that file. Handy for jumping back and forth between svn log, revision diffs, etc.
 " 	For example: execute :Slog, which opens a tab containing the log for that file. Put cursor over a revision number in the log, hit \sr. Diff of that revision will appear in the same tab. Execute :Slog again to return to the log.
 " Commands and shortcuts:
-" :Sdiff - show svn diff of current file
-" :Slog - show svn log of current file
-" :Sinfo - show svn info of current file
+" :Sdiff [path] - show svn diff of current file or path
+" :Slog [path] - show svn log of current file or path
+" :Sinfo [path] - show svn info of current file or path
 " :Sblame - show svn blame of current file
 " :Sdiffs - do a diffsplit of current file with HEAD version (very handy for refactoring)
 " \sr - show diff for file for revision under cursor.
 " 	For example, execute :Slog for a file, put cursor over 'r1234' in the log, and hit \sr
-com! Sdiff :call SvnDiff(bufname('%'))
-com! Slog :call SvnLog(bufname('%'))
-com! Sinfo :call SvnInfo(bufname('%'))
+com! -nargs=? Sdiff :call SvnDiff("<args>",bufname('%'))
+com! -nargs=? Slog :call SvnLog("<args>",bufname('%'))
+com! -nargs=? Sinfo :call SvnInfo("<args>",bufname('%'))
 com! Sblame :call SvnBlame(bufname('%'))
 com! Sdiffs :call SvnDiffSplit(expand('%:h'),expand('%:t'))
 " view diff for file at revision under cursor
 nmap <Leader>sr :call SvnModeDiff(expand('<cword>'))<CR>gg
 
-fun! SvnDiff(file)
-	let file = SvnModeWindow(a:file)
+fun! SvnDiff(args,file)
+	if a:args == ''
+		let file = SvnModeWindow(a:file)
+	else
+		let file = SvnModeWindow(a:args)
+	endif
 	exe "r !svn diff ".l:file
 	setlocal filetype=diff
 endfunction
-fun! SvnLog(file)
-	let file = SvnModeWindow(a:file)
+fun! SvnLog(args,file)
+	if a:args == ''
+		let file = SvnModeWindow(a:file)
+	else
+		let file = SvnModeWindow(a:args)
+	endif
 	setfiletype svnlog
 	exe "r !svn log -v ".l:file
 endfunction
-fun! SvnInfo(file)
-	let file = SvnModeWindow(a:file)
+fun! SvnInfo(args,file)
+	if a:args == ''
+		let file = SvnModeWindow(a:file)
+	else
+		let file = SvnModeWindow(a:args)
+	endif
 	exe "r !svn info ".l:file
 	setlocal filetype=yaml
 endfunction
