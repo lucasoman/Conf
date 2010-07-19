@@ -1,5 +1,5 @@
 " vim: fdm=marker:commentstring="%s
-" Recommended for vim >= 7, though works with vim 6
+" Recommended for vim >= 7; no guarantee of compatibility with earlier versions
 " Lucas Oman <me@lucasoman.com>
 " --enable-rubyinterp --prefix=/usr --enable-ruby
 " Get latest from: http://github.com/lucasoman/Conf/raw/master/.vimrc
@@ -23,15 +23,11 @@ set showcmd
 set showmode
 
 " max items in popup menu
-if version >= 700
-  set pumheight=8
-endif
+set pumheight=8
 
 " show number column
 set number
-if version >= 700
-  set numberwidth=3
-end
+set numberwidth=3
 
 " show fold column, fold by markers
 set foldcolumn=2
@@ -41,9 +37,7 @@ set foldmethod=marker
 set showbreak=>\ 
 
 " always show tab line
-if version >= 700
-  set showtabline=2
-endif
+set showtabline=2
 
 " highlight search matches
 set hlsearch
@@ -309,11 +303,9 @@ inoremap <Tab> <C-R>=CleverTab()<CR>
 
 nmap <Leader>nf :call WhichSession()<CR>
 
-if version >= 700
-	" localoptions has to be here:
-	" for some reason, new session loading code fails to set filetype of files in session
-  set sessionoptions=blank,tabpages,folds,localoptions
-endif
+" localoptions has to be here:
+" for some reason, new session loading code fails to set filetype of files in session
+set sessionoptions=blank,tabpages,folds,localoptions
 
 let s:sessionloaded = 0
 let s:loadingsession = 0
@@ -369,105 +361,103 @@ endfunction
 " ,- - reset item as uncomplete
 " ,N - set priority as N, where N is 1-5
 " ,t - add/update timestamp on item
-if version >= 700
-	autocmd BufNewFile,BufRead *.list call ListFile()
-	autocmd TabEnter *.list call ListFile()
+autocmd BufNewFile,BufRead *.list call ListFile()
+autocmd TabEnter *.list call ListFile()
 
-	" 'install' list features
-	fun! ListFile()
-		setlocal foldmethod=expr
-		setlocal foldexpr=ListFoldLevel(v:lnum)
-		setlocal shiftwidth=4
-		setlocal tabstop=4
-		setlocal foldtext=ListFoldLine(v:foldstart)
-		setlocal noshowmatch
-		setlocal cindent
-		" add [n]ew item below current
-		"nmap <buffer> ,n o-  [<ESC>:call ListTimestamp()<CR><ESC>^la
-		nmap <buffer> ,n o- 
-		" add new sub item below current
-		"nmap <buffer> ,s o-  [<ESC>:call ListTimestamp()<CR><ESC>>>^la
-		nmap <buffer> ,s o- <ESC>>>^la
-		" add new super item below current
-		nmap <buffer> ,u o- <ESC><<^la
-		" mark item as [x]
-		nmap <buffer> ,x mz^rx:call ListTimestamp()<CR><ESC>`z
-		" mark item as [-]
-		nmap <buffer> ,- mz^r-:call ListTimestamp()<CR><ESC>`z
-		" mark item as = (in [p]rogress)
-		nmap <buffer> ,p mz^r=:call ListTimestamp()<CR><ESC>`z
-		" mark item as [o]
-		nmap <buffer> ,o mz^ro:call ListTimestamp()<CR><ESC>`z
-		" mark item with a rank
-		nmap <buffer> ,1 mz^r1:call ListTimestamp()<CR><ESC>`z
-		nmap <buffer> ,2 mz^r2:call ListTimestamp()<CR><ESC>`z
-		nmap <buffer> ,3 mz^r3:call ListTimestamp()<CR><ESC>`z
-		nmap <buffer> ,4 mz^r4:call ListTimestamp()<CR><ESC>`z
-		nmap <buffer> ,5 mz^r5:call ListTimestamp()<CR><ESC>`z
-		" add/update [t]imestamp
-		nmap <buffer> ,t mz$a [<ESC>:call ListTimestamp()<CR><ESC>`z
-	endfunction
+" 'install' list features
+fun! ListFile()
+	setlocal foldmethod=expr
+	setlocal foldexpr=ListFoldLevel(v:lnum)
+	setlocal shiftwidth=4
+	setlocal tabstop=4
+	setlocal foldtext=ListFoldLine(v:foldstart)
+	setlocal noshowmatch
+	setlocal cindent
+	" add [n]ew item below current
+	"nmap <buffer> ,n o-  [<ESC>:call ListTimestamp()<CR><ESC>^la
+	nmap <buffer> ,n o- 
+	" add new sub item below current
+	"nmap <buffer> ,s o-  [<ESC>:call ListTimestamp()<CR><ESC>>>^la
+	nmap <buffer> ,s o- <ESC>>>^la
+	" add new super item below current
+	nmap <buffer> ,u o- <ESC><<^la
+	" mark item as [x]
+	nmap <buffer> ,x mz^rx:call ListTimestamp()<CR><ESC>`z
+	" mark item as [-]
+	nmap <buffer> ,- mz^r-:call ListTimestamp()<CR><ESC>`z
+	" mark item as = (in [p]rogress)
+	nmap <buffer> ,p mz^r=:call ListTimestamp()<CR><ESC>`z
+	" mark item as [o]
+	nmap <buffer> ,o mz^ro:call ListTimestamp()<CR><ESC>`z
+	" mark item with a rank
+	nmap <buffer> ,1 mz^r1:call ListTimestamp()<CR><ESC>`z
+	nmap <buffer> ,2 mz^r2:call ListTimestamp()<CR><ESC>`z
+	nmap <buffer> ,3 mz^r3:call ListTimestamp()<CR><ESC>`z
+	nmap <buffer> ,4 mz^r4:call ListTimestamp()<CR><ESC>`z
+	nmap <buffer> ,5 mz^r5:call ListTimestamp()<CR><ESC>`z
+	" add/update [t]imestamp
+	nmap <buffer> ,t mz$a [<ESC>:call ListTimestamp()<CR><ESC>`z
+endfunction
 
-	" fix properly formatted timestamp
-	fun! ListTimestamp()
-		let addStamp = 0
-		if getline('.') =~ '\['
-			let addStamp = 1
+" fix properly formatted timestamp
+fun! ListTimestamp()
+	let addStamp = 0
+	if getline('.') =~ '\['
+		let addStamp = 1
+	endif
+	normal ^t[d$
+	if l:addStamp
+		call ListTimestampString()
+		normal "zp
+	endif
+endfunction
+
+" return actual timestamp string
+fun! ListTimestampString()
+	let @z = ' ['.strftime('%y-%m-%d %H:%M').']'
+endfunction
+
+" return fold line format
+fun! ListFoldLine(linenum)
+	let s:count = 1
+	let s:spaces = ''
+	while s:count <= &shiftwidth
+		let s:spaces = s:spaces.' '
+		let s:count = s:count + 1
+	endwhile
+	return substitute(getline(a:linenum),"\t",s:spaces,'g')
+endfunction
+
+" foldexpr function
+fun! ListFoldLevel(linenum)
+	let s:prefix = ''
+	let s:myline = getline(a:linenum)
+	let s:nextline = getline(a:linenum+1)
+	let s:mynumtabs = match(s:myline,"[^\t]",0)
+	let s:nextnumtabs = match(s:nextline,"[^\t]",0)
+	if s:nextnumtabs > s:mynumtabs " if this item has sub-items
+		let s:level = s:nextnumtabs
+	else " next item is either same or higher level
+		let s:level = s:mynumtabs
+		if s:nextnumtabs < s:mynumtabs " if next item has higher level, close this fold
+			let s:prefix = '<'
+			let s:level = s:nextnumtabs+1
+		end
+	endif
+	if a:linenum > 1
+		s:pline = getline(a:linenum-1)
+		s:pnumtabs = match(s:pline,"[^\t]",0)
+		if s:level < s:pnumtabs
+		" if this is higher level than prev, start a new fold
+			let s:prefix = '>'
 		endif
-		normal ^t[d$
-		if l:addStamp
-			call ListTimestampString()
-			normal "zp
-		endif
-	endfunction
-
-	" return actual timestamp string
-	fun! ListTimestampString()
-		let @z = ' ['.strftime('%y-%m-%d %H:%M').']'
-	endfunction
-
-	" return fold line format
-	fun! ListFoldLine(linenum)
-		let s:count = 1
-		let s:spaces = ''
-		while s:count <= &shiftwidth
-			let s:spaces = s:spaces.' '
-			let s:count = s:count + 1
-		endwhile
-		return substitute(getline(a:linenum),"\t",s:spaces,'g')
-	endfunction
-
-	" foldexpr function
-	fun! ListFoldLevel(linenum)
-		let s:prefix = ''
-		let s:myline = getline(a:linenum)
-		let s:nextline = getline(a:linenum+1)
-		let s:mynumtabs = match(s:myline,"[^\t]",0)
-		let s:nextnumtabs = match(s:nextline,"[^\t]",0)
-		if s:nextnumtabs > s:mynumtabs " if this item has sub-items
-			let s:level = s:nextnumtabs
-		else " next item is either same or higher level
-			let s:level = s:mynumtabs
-			if s:nextnumtabs < s:mynumtabs " if next item has higher level, close this fold
-				let s:prefix = '<'
-				let s:level = s:nextnumtabs+1
-			end
-		endif
-		if a:linenum > 1
-			s:pline = getline(a:linenum-1)
-			s:pnumtabs = match(s:pline,"[^\t]",0)
-			if s:level < s:pnumtabs
-			" if this is higher level than prev, start a new fold
-				let s:prefix = '>'
-			endif
-		endif
-		return s:prefix.s:level
-	endfunction
-endif
+	endif
+	return s:prefix.s:level
+endfunction
 "}}}
 "SUBVERSION {{{
 " Adds some cooperation with SVN working copies to vim.
-" Introduces the idea of 'SVN Mode' - once an SVN tab is opened by one of the commands, that tab is in SVN Mode for that file. Executing another such command in that tab will act as if executed in the tab for that file. Handy for jumping back and forth between svn log, revision diffs, etc.
+" Introduces the idea of 'SVN Mode' - once an SVN tab is opened by one of the commands, that tab is in SVN Mode for that file or dir. Executing another such command in that tab will act as if executed in the tab for that file or dir. Handy for jumping back and forth between svn log, revision diffs, etc.
 " 	For example: execute :Slog, which opens a tab containing the log for that file. Put cursor over a revision number in the log, hit \sr. Diff of that revision will appear in the same tab. Execute :Slog again to return to the log.
 " Commands and shortcuts:
 " :Sdiff [path] - show svn diff of current file or path
@@ -478,6 +468,11 @@ endif
 " :Swin <path> - create a new SVN window for path
 " \sr - show diff for file for revision under cursor.
 " 	For example, execute :Slog for a file, put cursor over 'r1234' in the log, and hit \sr
+" \sf - view file under cursor at revision in diff
+"		For example, put cursor over the following line in a diff: "+++ path/to/some/class.php (revision 1234)"
+" Known issues:
+" - If an SVNMode window is the only open tab, executing any SVNMode command closes vim
+" - Using \sf in an SVNMode for a file breaks; only works in a SVNMode window for a dir
 com! -nargs=? Sdiff :call SvnDiff("<args>",bufname('%'))
 com! -nargs=? Slog :call SvnLog("<args>",bufname('%'))
 com! -nargs=? Sinfo :call SvnInfo("<args>",bufname('%'))
@@ -487,6 +482,7 @@ com! -nargs=? Srev :call SvnModeDiff("<args>")
 com! -nargs=? Swin :call SvnModeWindow("<args>")
 " view diff for file at revision under cursor
 nmap <Leader>sr :call SvnModeDiff(expand('<cword>'))<CR>gg
+nmap <Leader>sf :call SvnModeExport()<CR>gg
 
 fun! SvnDiff(args,file)
 	if a:args == ''
@@ -579,6 +575,24 @@ fun! SvnModeDiff(rev)
 		call SvnModeError()
 	endif
 endfunction
+fun! SvnModeExport()
+	if SvnMode()
+		let line = getline('.')
+		let matches = matchlist(l:line,'[-+]\+ \(\S\+\)	\S\+ \(\d\+\)')
+		let fileParts = split(l:matches[1],'/')
+		if w:svnFile =~ '//' " if it's a url, we have to append it
+			let exportFile = w:svnFile.'/'.l:matches[1]
+		else
+			let exportFile = l:matches[1]
+		endif
+		let tempFile = '~/tmp/'.l:fileParts[-1]
+		exe '!svn export '.l:exportFile.'@'.l:matches[2].' '.l:tempFile
+		exec 'tabe '.l:tempFile
+		nohl
+	else
+		call SvnModeError()
+	endif
+endfunction
 "}}}
 "CODE GREP {{{
 " grep for given string (second is case insensitive)
@@ -621,11 +635,7 @@ nmap <C-l> :call MoveTab(0)<CR>
 nmap <C-h> :call MoveTab(-2)<CR>
 
 " gf should use new tab, not current buffer
-if version >= 700
-	map gf :tabe <cfile><CR>
-else
-	map gf :bad <cfile><CR>
-endif
+map gf :tabe <cfile><CR>
 
 "tab line
 fun! MyTabLine()
@@ -663,10 +673,8 @@ fun! MyTabLabel(n)
 	return modified.fullname
 endfunction
 
-if version >= 700
-	" Use the above tabe naming scheme
-	set tabline=%!MyTabLine()
-endif
+" Use the above tabe naming scheme
+set tabline=%!MyTabLine()
 
 "tab moving
 fun! MoveTab(n)
