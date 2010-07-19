@@ -362,6 +362,7 @@ endfunction
 " Commands and shortcuts:
 " ,n - create new item
 " ,s - create sub item
+" ,u - create super item
 " ,p - item in progress
 " ,x - item completed
 " ,o - mark item with 'o'
@@ -386,7 +387,9 @@ if version >= 700
 		nmap <buffer> ,n o- 
 		" add new sub item below current
 		"nmap <buffer> ,s o-  [<ESC>:call ListTimestamp()<CR><ESC>>>^la
-		nmap <buffer> ,s o- 
+		nmap <buffer> ,s o- <ESC>>>^la
+		" add new super item below current
+		nmap <buffer> ,u o- <ESC><<^la
 		" mark item as [x]
 		nmap <buffer> ,x mz^rx:call ListTimestamp()<CR><ESC>`z
 		" mark item as [-]
@@ -471,14 +474,17 @@ endif
 " :Slog [path] - show svn log of current file or path
 " :Sinfo [path] - show svn info of current file or path
 " :Sblame - show svn blame of current file
-" :Sdiffs - do a diffsplit of current file with HEAD version (very handy for refactoring)
+" :Sdiffs [rev] - do a diffsplit of current file with version at revision (default HEAD) (very handy for refactoring)
+" :Swin <path> - create a new SVN window for path
 " \sr - show diff for file for revision under cursor.
 " 	For example, execute :Slog for a file, put cursor over 'r1234' in the log, and hit \sr
 com! -nargs=? Sdiff :call SvnDiff("<args>",bufname('%'))
 com! -nargs=? Slog :call SvnLog("<args>",bufname('%'))
 com! -nargs=? Sinfo :call SvnInfo("<args>",bufname('%'))
 com! Sblame :call SvnBlame(bufname('%'))
-com! Sdiffs :call SvnDiffSplit(expand('%:h'),expand('%:t'))
+com! -nargs=? Sdiffs :call SvnDiffSplit(expand('%:h'),expand('%:t'),"<args>")
+com! -nargs=? Srev :call SvnModeDiff("<args>")
+com! -nargs=? Swin :call SvnModeWindow("<args>")
 " view diff for file at revision under cursor
 nmap <Leader>sr :call SvnModeDiff(expand('<cword>'))<CR>gg
 
@@ -513,8 +519,13 @@ fun! SvnBlame(file)
 	let file = SvnModeWindow(a:file)
 	exe "r !svn blame ".l:file
 endfunction
-fun! SvnDiffSplit(path,file)
-	exe "!svn export -r HEAD ".a:path."/".a:file." ~/tmp/".a:file
+fun! SvnDiffSplit(path,file,rev)
+	if a:rev == ''
+		let rev = 'HEAD'
+	else
+		let rev = a:rev
+	endif
+	exe "!svn export -r ".l:rev." ".a:path."/".a:file." ~/tmp/".a:file
 	exe "vert diffsplit ~/tmp/".a:file
 endfunction
 
@@ -537,7 +548,7 @@ fun! SvnModeWindow(file)
 		let file = a:file
 	else
 		let file = w:svnFile
-		exe "q!"
+		exe "q"
 		tabe
 	endif
 	exe('tabm '.l:which)
