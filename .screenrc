@@ -1,8 +1,13 @@
+escape ^Bb
+
 # automatic detach on disconnect
 autodetach on
 
 # status line
-hardstatus alwayslastline "%{= kw} %-w%{= KB}%50>%n %t%{= kw}%+w %="
+hardstatus alwayslastline "%{= kw} %-w%{= KB}%50>%n %t%{= kw}%+w %=%l | %Y-%m-%d %c "
 
 # caption line always on
-caption always "%{= KB} %n %t | %H | %l %=| %Y-%m-%d %c "
+caption always "%{= KB} %n %t | %H %="
+
+bind j focus down
+bind k focus up
