@@ -4,6 +4,7 @@
 " --enable-rubyinterp --prefix=/usr --enable-ruby
 " Get latest from: http://github.com/lucasoman/Conf/raw/master/.vimrc
 
+
 " misc options
 " {{{ interface
 " lines, cols in status line
@@ -43,8 +44,8 @@ set showtabline=2
 set hlsearch
 
 " highlight position of cursor
-set cursorline
-set cursorcolumn
+"set cursorline
+"set cursorcolumn
 
 "set statusline=%f\ %2*%m\ %1*%h%r%=[%{&encoding}\ %{&fileformat}\ %{strlen(&ft)?&ft:'none'}\ %{getfperm(@%)}]\ 0x%B\ %12.(%c:%l/%L%)
 "set statusline=%<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P
@@ -101,7 +102,8 @@ set visualbell
 " show our whitespace
 " alternate character: »
 "not a big fan of this; will keep just in case
-"set listchars=tab:··,trail:·
+"set listchars=tab:\|\ 
+"set listchars=tab:\|�,trail:�
 "set list
 
 " complete to longest match, then list possibilities
@@ -290,6 +292,7 @@ fun! CleverTab()
 	if l:beginning =~ '^\s*$' || l:beginning =~ '\s$'
 		return "\<Tab>"
 	else
+		"return "\<C-X>\<C-O>"
 		return "\<C-P>"
 endfunction
 inoremap <Tab> <C-R>=CleverTab()<CR>
@@ -466,13 +469,14 @@ endfunction
 " :Sblame - show svn blame of current file
 " :Sdiffs [rev] - do a diffsplit of current file with version at revision (default HEAD) (very handy for refactoring)
 " :Swin <path> - create a new SVN window for path
+" :Srev <rev[:rev]> - view diff for revision(s)
 " \sr - show diff for file for revision under cursor.
 " 	For example, execute :Slog for a file, put cursor over 'r1234' in the log, and hit \sr
 " \sf - view file under cursor at revision in diff
 "		For example, put cursor over the following line in a diff: "+++ path/to/some/class.php (revision 1234)"
 " Known issues:
 " - If an SVNMode window is the only open tab, executing any SVNMode command closes vim
-" - Using \sf in an SVNMode for a file breaks; only works in a SVNMode window for a dir
+" - Using \sf in an SVNMode window for a file breaks; only works in a SVNMode window for a dir
 com! -nargs=? Sdiff :call SvnDiff("<args>",bufname('%'))
 com! -nargs=? Slog :call SvnLog("<args>",bufname('%'))
 com! -nargs=? Sinfo :call SvnInfo("<args>",bufname('%'))
@@ -566,10 +570,15 @@ endfunction
 fun! SvnModeDiff(rev)
 	if SvnMode()
 		" extract the rev number from the input
-		let matches = matchlist(a:rev,'[^0-9]*\([0-9]*\)[^0-9]*')
+		let matches = matchlist(a:rev,'[^0-9]*\([0-9:]*\)[^0-9]*')
 		let num = get(l:matches,1)
 		let file = SvnModeWindow('')
-		exe "r !svn diff -c ".l:num." ".l:file
+		if l:num =~ ':'
+			let option = '-r'
+		else
+			let option = '-c'
+		endif
+		exe "r !svn diff ".l:option." ".l:num." ".l:file
 		setl filetype=diff
 	else
 		call SvnModeError()
