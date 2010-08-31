@@ -170,6 +170,18 @@ let php_folding = 1  "for folding classes and functions
 "netrw options {{{
 let g:netrw_sort_sequence = '[\/]$,\.php,\.phtml,*,\.info$,\.swp$,\.bak$,\~$'
 "}}}
+"{{{taglist options
+" set the names of flags
+let tlist_php_settings = 'php;c:class;f:function;d:constant'
+" close all folds except for current file
+let Tlist_File_Fold_Auto_Close = 1
+" make tlist pane active when opened
+let Tlist_GainFocus_On_ToggleOpen = 1
+" width of window
+let Tlist_WinWidth = 40
+" close tlist when a selection is made
+let Tlist_Close_On_Select = 1
+"}}}
 
 " mappings
 " {{{ general
@@ -193,6 +205,9 @@ vmap <Leader>cu :s!^//!!<CR>
 nmap <Leader>l :60vsplit ~/projects.list<CR>
 " fix syntax highlighting
 nmap <Leader>ss :syntax sync fromstart<CR>
+" open local journal file
+nmap <Leader>j :60vsplit ~/journal.log<CR>G
+nmap <Leader>tl :TlistToggle<CR>
 "}}}
 " php {{{
 " syntax check
