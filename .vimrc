@@ -384,6 +384,7 @@ autocmd TabEnter *.list call ListFile()
 
 " 'install' list features
 fun! ListFile()
+	setfiletype listfile
 	setlocal foldmethod=expr
 	setlocal foldexpr=ListFoldLevel(v:lnum)
 	setlocal shiftwidth=4
