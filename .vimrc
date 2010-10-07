@@ -700,4 +700,3 @@ fun! MoveTab(n)
 	exe "tabm ".which
 endfunction
 "}}}
-"test
