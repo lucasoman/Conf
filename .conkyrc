@@ -1,0 +1,28 @@
+alignment tm
+background no
+own_window yes
+own_window_hints sticky undecorated below skip_taskbar
+own_window_transparent yes
+double_buffer yes
+maximum_width 450
+font 6x10
+update_interval 5
+text_buffer_size 768
+cpu_avg_samples 2
+default_color white
+draw_shades yes
+
+TEXT
+${color yellow}erdos $hr$color
+${execi 20 top -b -n 1|grep -vP '^(Tasks|Cpu\(s\)):'|head -n 8}
+
+${color yellow}net $hr$color
+Down: ${downspeed eth1} Up: ${upspeed eth1}
+${downspeedgraph eth1 25,200 0 $color} ${upspeedgraph eth1 25,200 0 $color}
+
+${color yellow}euler $hr$color
+${execi 20 ssh euler 'top -b -n 1|grep -vP "^(Tasks|Cpu\\(s\\)):"|head -n 8'}
+
+${color yellow}${hr 3}$color
+
+${execi 3600 cal -3}
