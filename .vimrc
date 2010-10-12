@@ -368,38 +368,51 @@ endfunction
 " Creates and maintains text files of nested lists.
 " File must end in '.list'.
 " Use >> and << to adjust depth of item.
-" Includes nested folding for lists.
+" Includes nested folding for lists. Use standard vim fold shortcuts.
 " Commands and shortcuts:
 " ,n - create new item
 " ,s - create sub item
 " ,u - create super item
-" ,p - item in progress
-" ,x - item completed
+" ,p - mark item with '=' (in progress)
+" ,x - mark item with 'x' (completed)
 " ,o - mark item with 'o'
-" ,- - reset item as uncomplete
+" ,? - mark item with '?'
+" ,- - mark item with '-' (default, incomplete)
 " ,N - set priority as N, where N is 1-5
 " ,t - add/update timestamp on item
+
+" should items have timestamps by default?
+let listFile_timestamp = 0
+" how far should each level indent?
+let listFile_indent = 4
+
 autocmd BufNewFile,BufRead *.list call ListFile()
-autocmd TabEnter *.list call ListFile()
 
 " 'install' list features
 fun! ListFile()
 	setfiletype listfile
 	setlocal foldmethod=expr
 	setlocal foldexpr=ListFoldLevel(v:lnum)
-	setlocal shiftwidth=4
-	setlocal tabstop=4
+	exec 'setlocal shiftwidth='.g:listFile_indent
+	exec 'setlocal tabstop='.g:listFile_indent
 	setlocal foldtext=ListFoldLine(v:foldstart)
 	setlocal noshowmatch
 	setlocal cindent
-	" add [n]ew item below current
-	"nmap <buffer> ,n o-  [<ESC>:call ListTimestamp()<CR><ESC>^la
-	nmap <buffer> ,n o- 
-	" add new sub item below current
-	"nmap <buffer> ,s o-  [<ESC>:call ListTimestamp()<CR><ESC>>>^la
-	nmap <buffer> ,s o- <ESC>>>^la
-	" add new super item below current
-	nmap <buffer> ,u o- <ESC><<^la
+	if (g:listFile_timestamp == 1)
+		" add [n]ew item below current
+		nmap <buffer> ,n o-  [<ESC>:call ListTimestamp()<CR><ESC>^la
+		" add new sub item below current
+		nmap <buffer> ,s o-  [<ESC>:call ListTimestamp()<CR><ESC>>>^la
+		" add new super item below current
+		nmap <buffer> ,u o-  [<ESC>:call ListTimestamp()<CR><ESC><<^la
+	else
+		" add [n]ew item below current
+		nmap <buffer> ,n o- 
+		" add new sub item below current
+		nmap <buffer> ,s o- <ESC>>>^la
+		" add new super item below current
+		nmap <buffer> ,u o- <ESC><<^la
+	endif
 	" mark item as [x]
 	nmap <buffer> ,x mz^rx:call ListTimestamp()<CR><ESC>`z
 	" mark item as [-]
@@ -408,7 +421,9 @@ fun! ListFile()
 	nmap <buffer> ,p mz^r=:call ListTimestamp()<CR><ESC>`z
 	" mark item as [o]
 	nmap <buffer> ,o mz^ro:call ListTimestamp()<CR><ESC>`z
-	" mark item with a rank
+	" mark item as [?]
+	nmap <buffer> ,? mz^r?:call ListTimestamp()<CR><ESC>`z
+	" mark item with a priority
 	nmap <buffer> ,1 mz^r1:call ListTimestamp()<CR><ESC>`z
 	nmap <buffer> ,2 mz^r2:call ListTimestamp()<CR><ESC>`z
 	nmap <buffer> ,3 mz^r3:call ListTimestamp()<CR><ESC>`z
