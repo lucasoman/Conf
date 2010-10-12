@@ -368,7 +368,7 @@ endfunction
 " Creates and maintains text files of nested lists.
 " File must end in '.list'.
 " Use >> and << to adjust depth of item.
-" Includes nested folding for lists. Use standard vim fold shortcuts.
+" Includes nested folding for lists. Use standard vim fold shortcuts (e.g.: zo, zc).
 " Commands and shortcuts:
 " ,n - create new item
 " ,s - create sub item
@@ -380,6 +380,7 @@ endfunction
 " ,- - mark item with '-' (default, incomplete)
 " ,N - set priority as N, where N is 1-5
 " ,t - add/update timestamp on item
+" :Lmark <mark> - find all items with <mark> (e.g.: =, 1, -, etc.) using location list
 
 " should items have timestamps by default?
 let listFile_timestamp = 0
@@ -387,6 +388,7 @@ let listFile_timestamp = 0
 let listFile_indent = 4
 
 autocmd BufNewFile,BufRead *.list call ListFile()
+com! -nargs=1 Lmark :call ListMark("<args>")
 
 " 'install' list features
 fun! ListFile()
@@ -431,6 +433,11 @@ fun! ListFile()
 	nmap <buffer> ,5 mz^r5:call ListTimestamp()<CR><ESC>`z
 	" add/update [t]imestamp
 	nmap <buffer> ,t mz$a [<ESC>:call ListTimestamp()<CR><ESC>`z
+endfunction
+
+fun! ListMark(mark)
+	exe 'lvimgrep /^\s*'.a:mark.'/ %'
+	lopen
 endfunction
 
 " fix properly formatted timestamp
