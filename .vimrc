@@ -381,6 +381,7 @@ endfunction
 " ,N - set priority as N, where N is 1-5
 " ,t - add/update timestamp on item
 " :Lmark <mark> - find all items with <mark> (e.g.: =, 1, -, etc.) using location list
+" :Lcreate <name> - create new list file with <name> (".list" is added automagically)
 
 " should items have timestamps by default?
 let listFile_timestamp = 0
@@ -389,6 +390,7 @@ let listFile_indent = 4
 
 autocmd BufNewFile,BufRead *.list call ListFile()
 com! -nargs=1 Lmark :call ListMark("<args>")
+com! -nargs=1 Lcreate :call ListCreate("<args>")
 
 " 'install' list features
 fun! ListFile()
@@ -438,6 +440,12 @@ endfunction
 fun! ListMark(mark)
 	exe 'lvimgrep /^\s*'.a:mark.'/ %'
 	lopen
+endfunction
+
+fun! ListCreate(name)
+	exe 'tabe '.a:name.'.list'
+	let @z = '- '
+	normal "zP
 endfunction
 
 " fix properly formatted timestamp
