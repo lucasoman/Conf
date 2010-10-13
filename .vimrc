@@ -231,7 +231,7 @@ nmap <Leader>sk :!svn propset svn:keywords "Rev Date Id Author HeadURL" %<CR>
 "f keys {{{
 nmap <F2> :call ToggleColumns()<CR>
 imap <F2> <C-o>:call ToggleColumns()<CR>
-nmap <F3> :call LoadSession()<CR>
+nmap <F3> :Nload<CR>
 set pastetoggle=<F5>
 nmap <F7> :!updatedev.php %:p<CR>
 nmap <F8> :call WriteTrace()<CR>
@@ -316,10 +316,13 @@ inoremap <Tab> <C-R>=CleverTab()<CR>
 " Allows you to manage multiple session files for different projects.
 " Use vim's :mksession [filename] command to create a session.
 " Commands and shortcuts:
-" \nf - display currently loaded session file
-" F3 - load session file
+" :Nwhich - display name of currently used session file
+" :Nload - load a session file
+" :Ncreate <name> - create a new session with <name>. ".vim" extension is added automagically
 
-nmap <Leader>nf :call WhichSession()<CR>
+com! -nargs=0 Nwhich :call WhichSession()
+com! -nargs=0 Nload :call LoadSession()
+com! -nargs=1 Ncreate :call CreateSession("<args>")
 
 " localoptions has to be here:
 " for some reason, new session loading code fails to set filetype of files in session
@@ -331,6 +334,7 @@ let s:sessionfile = ''
 let s:netrwsort = ''
 autocmd BufRead *.vim call LoadSessionFinish()
 autocmd VimLeave * call SaveSession()
+
 " open current dir to select a session file
 fun! LoadSession()
 	" save current netrw sort sequence
@@ -340,6 +344,7 @@ fun! LoadSession()
 	let s:loadingsession = 1
 	e .
 endfunction
+
 " we've selected a file, so load it
 fun! LoadSessionFinish()
 	if s:loadingsession == 1
@@ -352,6 +357,7 @@ fun! LoadSessionFinish()
 		source %
 	end
 endfunction
+
 " save the session (if one was loaded) when exiting
 fun! SaveSession()
   if s:sessionloaded == 1
@@ -359,6 +365,15 @@ fun! SaveSession()
     exe "mksession! ".s:sessionfile
   end
 endfunction
+
+" create a new session
+fun! CreateSession(name)
+	exe 'mksession! '.a:name.'.vim'
+	let s:loadingsession = 0
+	let s:sessionloaded = 1
+	let s:sessionfile = a:name.'.vim'
+endfunction
+
 " print which session file is being used
 fun! WhichSession()
 	echo "Session: ".s:sessionfile
