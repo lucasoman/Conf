@@ -395,6 +395,7 @@ endfunction
 " ,- - mark item with '-' (default, incomplete)
 " ,N - set priority as N, where N is 1-5
 " ,t - add/update timestamp on item
+" ,r - sort highlighted items
 " :Lmark <mark> - find all items with <mark> (e.g.: =, 1, -, etc.) using location list
 " :Lcreate <name> - create new list file with <name> (".list" is added automagically)
 
@@ -450,6 +451,7 @@ fun! ListFile()
 	nmap <buffer> ,5 mz^r5:call ListTimestamp()<CR><ESC>`z
 	" add/update [t]imestamp
 	nmap <buffer> ,t mz$a [<ESC>:call ListTimestamp()<CR><ESC>`z
+	vmap <buffer> ,r :!sort<CR>
 endfunction
 
 fun! ListMark(mark)
