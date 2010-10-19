@@ -385,18 +385,21 @@ endfunction
 " Use >> and << to adjust depth of item.
 " Includes nested folding for lists. Use standard vim fold shortcuts (e.g.: zo, zc).
 " Commands and shortcuts:
+" CREATING
 " ,n - create new item
 " ,s - create sub item
 " ,u - create super item
+" MARKING
 " ,p - mark item with '=' (in progress)
 " ,x - mark item with 'x' (completed)
 " ,o - mark item with 'o'
 " ,? - mark item with '?'
 " ,- - mark item with '-' (default, incomplete)
 " ,N - set priority as N, where N is 1-5
+" ET CETERA
 " ,t - add/update timestamp on item
-" ,r - sort highlighted items
-" :Lmark <mark> - find all items with <mark> (e.g.: =, 1, -, etc.) using location list
+" ,r - sort highlighted items (alpha)
+" :Lsearch <mark> - find all items with <mark> (e.g.: =, 1, -, etc.) using location list
 " :Lcreate <name> - create new list file with <name> (".list" is added automagically)
 
 " should items have timestamps by default?
@@ -405,7 +408,7 @@ let listFile_timestamp = 0
 let listFile_indent = 4
 
 autocmd BufNewFile,BufRead *.list call ListFile()
-com! -nargs=1 Lmark :call ListMark("<args>")
+com! -nargs=1 Lsearch :call ListMark("<args>")
 com! -nargs=1 Lcreate :call ListCreate("<args>")
 
 " 'install' list features
@@ -434,24 +437,41 @@ fun! ListFile()
 		nmap <buffer> ,u o- <ESC><<^la
 	endif
 	" mark item as [x]
-	nmap <buffer> ,x mz^rx:call ListTimestamp()<CR><ESC>`z
+	nmap <buffer> ,x :call ListSetMark('x')<CR>
+	vmap <buffer> ,x :call ListSetMarkV('x')<CR>
 	" mark item as [-]
-	nmap <buffer> ,- mz^r-:call ListTimestamp()<CR><ESC>`z
+	nmap <buffer> ,- :call ListSetMark('-')<CR>
+	vmap <buffer> ,- :call ListSetMarkV('\-')<CR>
 	" mark item as = (in [p]rogress)
-	nmap <buffer> ,p mz^r=:call ListTimestamp()<CR><ESC>`z
+	nmap <buffer> ,p :call ListSetMark('=')<CR>
+	vmap <buffer> ,p :call ListSetMarkV('=')<CR>
 	" mark item as [o]
-	nmap <buffer> ,o mz^ro:call ListTimestamp()<CR><ESC>`z
+	nmap <buffer> ,o :call ListSetMark('o')<CR>
+	vmap <buffer> ,o :call ListSetMarkV('o')<CR>
 	" mark item as [?]
-	nmap <buffer> ,? mz^r?:call ListTimestamp()<CR><ESC>`z
+	nmap <buffer> ,? :call ListSetMark('?')<CR>
+	vmap <buffer> ,? :call ListSetMarkV('?')<CR>
 	" mark item with a priority
-	nmap <buffer> ,1 mz^r1:call ListTimestamp()<CR><ESC>`z
-	nmap <buffer> ,2 mz^r2:call ListTimestamp()<CR><ESC>`z
-	nmap <buffer> ,3 mz^r3:call ListTimestamp()<CR><ESC>`z
-	nmap <buffer> ,4 mz^r4:call ListTimestamp()<CR><ESC>`z
-	nmap <buffer> ,5 mz^r5:call ListTimestamp()<CR><ESC>`z
+	nmap <buffer> ,1 :call ListSetMark('1')<CR>
+	nmap <buffer> ,2 :call ListSetMark('2')<CR>
+	nmap <buffer> ,3 :call ListSetMark('3')<CR>
+	nmap <buffer> ,4 :call ListSetMark('4')<CR>
+	nmap <buffer> ,5 :call ListSetMark('5')<CR>
 	" add/update [t]imestamp
 	nmap <buffer> ,t mz$a [<ESC>:call ListTimestamp()<CR><ESC>`z
 	vmap <buffer> ,r :!sort<CR>
+endfunction
+
+fun! ListSetMark(mark)
+	let @z = a:mark
+	normal mz^dl"zP
+	call ListTimestamp()
+	normal `z
+endfunction
+
+fun! ListSetMarkV(mark)
+	exe "'<,'>s/^\\(\\s\\+\\)./\\1".a:mark."/"
+	nohl
 endfunction
 
 fun! ListMark(mark)
