@@ -227,6 +227,18 @@ nmap <Leader>cp o/**<CR><CR><CR>@author Lucas Oman <me@lucasoman.com><CR>@param 
 " svn {{{
 nmap <Leader>sc :!svnconsole.php<CR><CR>
 nmap <Leader>sk :!svn propset svn:keywords "Rev Date Id Author HeadURL" %<CR>
+nmap <Leader>sp :call SvnPushFile()<CR>
+com! -nargs=1 Sstat :call SvnStatus("<args>")
+fun! SvnStatus(path)
+	tabe
+	setl buftype=nofile
+	exe "r !svn st ".a:path
+endfunction
+fun! SvnPushFile()
+	let line = getline('.')
+	let file = strpart(l:line,8)
+	exe "!updatedev.php ".l:file
+endfunction
 "}}}
 "f keys {{{
 nmap <F2> :call ToggleColumns()<CR>
@@ -391,5 +403,19 @@ fun! MoveTab(n)
 	let which = tabpagenr()
 	let which = which + a:n
 	exe "tabm ".which
+endfunction
+"}}}
+"{{{ svn mode
+com! -nargs=0 Dbopen :call DbOpen()
+fun! DbOpen()
+	tabe
+	setl buftype=nofile
+	nmap <buffer> <CR> :call DbExecute()<CR>
+endfunction
+fun! DbExecute()
+	let query = getline('.')
+	tabe
+	setl buftype=nofile
+	exe "r !mysql -u ".g:db_user." -h ".g:db_host." --password=".g:db_pass." -e '".l:query."'"
 endfunction
 "}}}
