@@ -416,6 +416,6 @@ fun! DbExecute()
 	let query = getline('.')
 	tabe
 	setl buftype=nofile
-	exe "r !mysql -u ".g:db_user." -h ".g:db_host." --password=".g:db_pass." -e '".l:query."'"
+	exe "r !mysql -u ".g:db_user." -h ".g:db_host." --password=".g:db_pass." -t -e '".l:query."'"
 endfunction
 "}}}
