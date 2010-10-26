@@ -21,9 +21,27 @@
 " :Lcreate <name> - create new list file with <name> (".list" is added automagically)
 
 " should items have timestamps by default?
-let listFile_timestamp = 0
+if (!exists("g:listFile_timestamp"))
+	let listFile_timestamp = 0
+endif
 " how far should each level indent?
-let listFile_indent = 4
+if (!exists("g:listFile_indent"))
+	let listFile_indent = 4
+endif
+if (!exists("g:listFile_ranks"))
+	let listFile_ranks = {
+		\'1':0,
+		\'2':1,
+		\'3':2,
+		\'4':3,
+		\'5':4,
+		\'=':5,
+		\'o':6,
+		\'-':7,
+		\'?':8,
+		\'x':9
+	\}
+endif
 
 autocmd BufNewFile,BufRead *.list call ListFile()
 com! -nargs=1 Lsearch :call ListMark("<args>")
@@ -32,6 +50,7 @@ com! -nargs=1 Lcreate :call ListCreate("<args>")
 " 'install' list features
 fun! ListFile()
 	setfiletype listfile
+	" set some options
 	setlocal foldmethod=expr
 	setlocal foldexpr=ListFoldLevel(v:lnum)
 	exec 'setlocal shiftwidth='.g:listFile_indent
@@ -39,6 +58,7 @@ fun! ListFile()
 	setlocal foldtext=ListFoldLine(v:foldstart)
 	setlocal noshowmatch
 	setlocal cindent
+	" map all the magic shortcuts
 	if (g:listFile_timestamp == 1)
 		" add [n]ew item below current
 		nmap <buffer> ,n o-  [<ESC>:call ListTimestamp()<CR><ESC>^la
@@ -77,7 +97,7 @@ fun! ListFile()
 	nmap <buffer> ,5 :call ListSetMark('5')<CR>
 	" add/update [t]imestamp
 	nmap <buffer> ,t mz$a [<ESC>:call ListTimestamp()<CR><ESC>`z
-	vmap <buffer> ,r :!sort<CR>
+	vmap <buffer> ,r :call ListSort()<CR>
 endfunction
 
 fun! ListSetMark(mark)
@@ -157,4 +177,25 @@ fun! ListFoldLevel(linenum)
 		endif
 	endif
 	return s:prefix.s:level
+endfunction
+
+" sort highlighted lines
+fun! ListSort() range
+	let lines = getline(a:firstline,a:lastline)
+	let sorted = sort(l:lines,"ListSortFunction")
+	call setline(a:firstline,l:sorted)
+endfunction
+
+" sorting function
+fun! ListSortFunction(one,two)
+	let onerank = ListGetItemRank(a:one)
+	let tworank = ListGetItemRank(a:two)
+	return l:onerank == l:tworank ? 0 : l:onerank < l:tworank ? -1 : 1
+endfunction
+
+" get rank for the given line based on user-defined mark ranks
+fun! ListGetItemRank(line)
+	let matches = matchlist(a:line,'^\s*\(\S\+\)')
+	let mark = l:matches[1]
+	return g:listFile_ranks[l:mark]
 endfunction
