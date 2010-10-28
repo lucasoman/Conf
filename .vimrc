@@ -408,7 +408,8 @@ endfunction
 "{{{ svn mode
 com! -nargs=0 Dbopen :call DbOpen()
 fun! DbOpen()
-	tabe
+	tabe MySQL
+	setl filetype=mysql
 	setl buftype=nofile
 	nmap <buffer> <CR> :call DbExecute()<CR>
 endfunction
