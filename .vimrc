@@ -182,6 +182,9 @@ let Tlist_WinWidth = 40
 " close tlist when a selection is made
 let Tlist_Close_On_Select = 1
 "}}}
+"{{{html options
+let html_use_css = 1
+"}}}
 
 " mappings
 " {{{ general
@@ -405,18 +408,27 @@ fun! MoveTab(n)
 	exe "tabm ".which
 endfunction
 "}}}
-"{{{ svn mode
+"{{{ MYSQL MODE
 com! -nargs=0 Dbopen :call DbOpen()
 fun! DbOpen()
 	tabe MySQL
 	setl filetype=mysql
 	setl buftype=nofile
 	nmap <buffer> <CR> :call DbExecute()<CR>
+	vmap <buffer> <CR> :call DbExecuteV()<CR>
 endfunction
 fun! DbExecute()
 	let query = getline('.')
+	call DbExecuteQuery(l:query)
+endfunction
+fun! DbExecuteV() range
+	let query = join(getline(a:firstline,a:lastline),' ')
+	call DbExecuteQuery(l:query)
+endfunction
+fun! DbExecuteQuery(query)
 	tabe
 	setl buftype=nofile
-	exe "r !mysql -u ".g:db_user." -h ".g:db_host." --password=".g:db_pass." -t -e '".l:query."'"
+	let query = escape(shellescape(a:query),'%')
+	exe "r !mysql -u ".g:db_user." -h ".g:db_host." --password=".g:db_pass." -t -e ".l:query
 endfunction
 "}}}
