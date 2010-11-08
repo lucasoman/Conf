@@ -2,7 +2,7 @@
 " Introduces the idea of 'SVN Mode' - once an SVN tab is opened by one of the commands, that tab is in SVN Mode for that file or dir. Executing another such command in that tab will act as if executed in the tab for that file or dir. Handy for jumping back and forth between svn log, revision diffs, etc.
 " 	For example: execute :Slog, which opens a tab containing the log for that file. Put cursor over a revision number in the log, hit \sr. Diff of that revision will appear in the same tab. Execute :Slog again to return to the log.
 " Commands and shortcuts:
-" :Sdiff [path] - show svn diff of current file or path
+" :Sdiff [path [changelist]] - show svn diff of current file or path using optional changelist
 " :Slog [path] - show svn log of current file or path
 " :Sinfo [path] - show svn info of current file or path
 " :Sblame - show svn blame of current file
@@ -28,12 +28,18 @@ nmap <Leader>sr :call SvnModeDiff(expand('<cword>'))<CR>gg
 nmap <Leader>sf :call SvnModeExport()<CR>gg
 
 fun! SvnDiff(args,file)
-	if a:args == ''
+	let argList = split(a:args,' ')
+	if (empty(l:argList))
 		let file = SvnModeWindow(a:file)
 	else
-		let file = SvnModeWindow(a:args)
+		let file = SvnModeWindow(l:argList[0])
 	endif
-	exe "r !svn diff -x --ignore-eol-style -x -b ".l:file
+	if (get(l:argList,1,'') != '')
+		let options = '--changelist '.l:argList[1].' '
+	else
+		let options = ''
+	endif
+	exe "r !svn diff -x --ignore-eol-style -x -b ".l:options.l:file
 	setlocal filetype=diff
 endfunction
 fun! SvnLog(args,file)

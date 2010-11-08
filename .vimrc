@@ -428,7 +428,11 @@ endfunction
 fun! DbExecuteQuery(query)
 	tabe
 	setl buftype=nofile
+	setfiletype mysqlresult
 	let query = escape(shellescape(a:query),'%')
+	let @z = "Query:\n".a:query."\n\nResult:"
+	normal "zPG
 	exe "r !mysql -u ".g:db_user." -h ".g:db_host." --password=".g:db_pass." -t -e ".l:query
+	normal gg
 endfunction
 "}}}
