@@ -211,6 +211,11 @@ nmap <Leader>ss :syntax sync fromstart<CR>
 " open local journal file
 nmap <Leader>j :60vsplit ~/journal.log<CR>G
 nmap <Leader>tl :TlistToggle<CR>
+" make arrow keys useful
+nmap <left> <C-W>h
+nmap <right> <C-W>l
+nmap <up> <C-W>k
+nmap <down> <C-W>j
 "}}}
 " php {{{
 " syntax check
@@ -355,7 +360,6 @@ endfunction
 " L - navigate to tab to the right
 " C-l - move current tab left
 " C-h - move current tab right
-" Open Current (path)
 " gf - changes default behavior from opening file under cursor in current window to opening in new tab
 nmap <Leader>oc :tabe %:h<CR>
 
