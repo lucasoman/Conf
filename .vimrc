@@ -311,16 +311,23 @@ let s:snippets['^\s*while$'] = " () {\<CR>}\<ESC>k^f)i"
 " when tab is pressed:
 " 1) checks snippets for matches, return match if there is one
 " 2) if character behind cursor is whitespace, just return a tab
-" 3) otherwise, try to ctrl-p complete
+" 3) if word behind cursor contains a slash, try filename complete
+" 4) otherwise, try to ctrl-p complete
 fun! CleverTab()
 	let beginning = strpart( getline('.'), 0, col('.')-1 )
+	let words = split(l:beginning,' ')
+	let thisWord = l:words[-1]
+
 	for key in keys(s:snippets)
 		if l:beginning =~ key
 			return s:snippets[key]
 		endif
 	endfor
-	if l:beginning =~ '^\s*$' || l:beginning =~ '\s$'
+
+	if l:beginning =~ '\s$'
 		return "\<Tab>"
+	elseif (l:thisWord =~ '/')
+		return "\<C-X>\<C-F>"
 	else
 		"return "\<C-X>\<C-O>"
 		return "\<C-P>"
