@@ -319,17 +319,21 @@ let s:snippets['^\s*while$'] = " () {\<CR>}\<ESC>k^f)i"
 " 3) if word behind cursor contains a slash, try filename complete
 " 4) otherwise, try to ctrl-p complete
 fun! CleverTab()
-	let beginning = strpart( getline('.'), 0, col('.')-1 )
-	let words = split(l:beginning,' ')
-	let thisWord = l:words[-1]
+	if col('.') > 1
+		let beginning = strpart( getline('.'), 0, col('.')-1 )
+		let words = split(l:beginning,' ')
+		let thisWord = l:words[-1]
 
-	for key in keys(s:snippets)
-		if l:beginning =~ key
-			return s:snippets[key]
-		endif
-	endfor
+		for key in keys(s:snippets)
+			if l:beginning =~ key
+				return s:snippets[key]
+			endif
+		endfor
+	else
+		let beginning = ''
+	endif
 
-	if l:beginning =~ '\s$'
+	if l:beginning == '' || l:beginning =~ '\s$'
 		return "\<Tab>"
 	elseif (l:thisWord =~ '/')
 		return "\<C-X>\<C-F>"
