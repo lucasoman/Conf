@@ -51,13 +51,13 @@ com! -nargs=1 Lcreate :call ListCreate("<args>")
 fun! ListFile()
 	setfiletype listfile
 	" set some options
-	setlocal foldmethod=expr
-	setlocal foldexpr=ListFoldLevel(v:lnum)
-	exec 'setlocal shiftwidth='.g:listFile_indent
-	exec 'setlocal tabstop='.g:listFile_indent
-	setlocal foldtext=ListFoldLine(v:foldstart)
-	setlocal noshowmatch
-	setlocal cindent
+	setl foldmethod=expr
+	setl foldexpr=ListFoldLevel(v:lnum)
+	exe 'setlocal shiftwidth='.g:listFile_indent
+	exe 'setlocal tabstop='.g:listFile_indent
+	setl foldtext=ListFoldLine(v:foldstart)
+	setl noshowmatch
+	setl cindent
 	" map all the magic shortcuts
 	if (g:listFile_timestamp == 1)
 		" add [n]ew item below current
@@ -74,6 +74,8 @@ fun! ListFile()
 		" add new super item below current
 		nmap <buffer> ,u o- <ESC><<^la
 	endif
+	imap <buffer> <tab> <ESC>,n
+	nmap <buffer> <tab> ,n
 	" mark item as [x]
 	nmap <buffer> ,x :call ListSetMark('x')<CR>
 	vmap <buffer> ,x :call ListSetMarkV('x')<CR>
