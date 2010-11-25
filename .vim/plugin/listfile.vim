@@ -201,8 +201,13 @@ endfunction
 fun! ListSort(start,end)
 	let s:sortLines = getline(a:start,a:end)
 	let s:sortDict = {0:[]}
-	let depth = ListGetDepth(s:sortLines[0])
-	call ListDictFormat([0],l:depth,1)
+
+	let s:curDepth = ListGetDepth(s:sortLines[0])
+	let s:stack = [0]
+	let s:index = 0
+
+	while (ListDictFormat())
+	endwhile
 	let sorted = ListCompileSorted(0)
 	call setline(a:start,l:sorted)
 endfunction
@@ -226,28 +231,31 @@ fun! ListCompileSorted(index)
 	endif
 endfunction
 
-fun! ListDictFormat(stack,depth,index)
+" put entire list in dictionary format for sorting
+" this cannot be recursive, as any list file with lines > maxfuncdepth could be sorted
+fun! ListDictFormat()
 	if (len(s:sortLines) == 0)
-		return
+		return 0
 	endif
-	let index = a:index + 1
 	let line = remove(s:sortLines,0)
-	let depth = ListGetDepth(l:line)
-	if (l:depth > a:depth) " we're starting a sub-list
+	let s:prevDepth = s:curDepth
+	let s:curDepth = ListGetDepth(l:line)
+	if (s:curDepth > s:prevDepth) " we're starting a sub-list
 		" add prev index to stack because it's now a parent
-		call add(a:stack,a:index)
+		call add(s:stack,s:index)
 		" create empty list in dictionary
-		let s:sortDict[a:index] = []
-	elseif (l:depth < a:depth) " we're ending sub-list(s)
+		let s:sortDict[s:index] = []
+	elseif (s:curDepth < s:prevDepth) " we're ending sub-list(s)
 		" pop the stack as many times as necessary
-		let diff = a:depth - l:depth
+		let diff = s:prevDepth - s:curDepth
 		while (l:diff > 0)
-			call remove(a:stack,len(a:stack)-1)
+			call remove(s:stack,len(s:stack)-1)
 			let diff = l:diff - 1
 		endwhile
 	endif
-	call add(s:sortDict[a:stack[len(a:stack) - 1]],[l:index,l:line])
-	call ListDictFormat(a:stack,l:depth,l:index)
+	call add(s:sortDict[s:stack[len(s:stack) - 1]],[s:index + 1,l:line])
+	let s:index = s:index + 1
+	return 1
 endfunction
 
 " sorting function
