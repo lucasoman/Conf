@@ -57,7 +57,7 @@ fun! ListFile()
 	setl foldexpr=ListFoldLevel(v:lnum)
 	exe 'setlocal shiftwidth='.g:listFile_indent
 	exe 'setlocal tabstop='.g:listFile_indent
-	setl foldtext=ListFoldLine(v:foldstart)
+	setl foldtext=ListFoldLine()
 	setl noshowmatch
 	setl cindent
 	" map all the magic shortcuts
@@ -151,14 +151,14 @@ endfunction
 """
 
 " return fold line format
-fun! ListFoldLine(linenum)
+fun! ListFoldLine()
 	let s:count = 1
 	let s:spaces = ''
 	while s:count <= &shiftwidth
 		let s:spaces = s:spaces.' '
 		let s:count = s:count + 1
 	endwhile
-	return substitute(getline(a:linenum),"\t",s:spaces,'g')
+	return substitute(getline(v:foldstart),"\t",s:spaces,'g')
 endfunction
 
 " foldexpr function
