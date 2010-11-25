@@ -4,7 +4,7 @@ own_window yes
 own_window_hints sticky undecorated below skip_taskbar
 own_window_transparent yes
 double_buffer yes
-maximum_width 450
+maximum_width 470
 font 6x10
 update_interval 5
 text_buffer_size 768
