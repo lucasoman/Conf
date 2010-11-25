@@ -17,7 +17,8 @@
 " ,N - set priority as N, where N is 1-5
 " ET CETERA
 " ,t - add/update timestamp on item
-" ,r - sort highlighted items (alpha)
+" ,r - (visual line) sort highlighted items
+" ,r - (normal) sort entire file
 " :Lsearch <mark> - find all items with <mark> (e.g.: =, 1, -, etc.) using location list
 " :Lcreate <name> - create new list file with <name> (".list" is added automagically)
 
