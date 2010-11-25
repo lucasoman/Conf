@@ -5,7 +5,7 @@
 " Commands and shortcuts:
 " CREATING
 " ,n - create new item
-" <tab> - create new item
+" <tab> - (insert or normal) create new item
 " ,s - create sub item
 " ,u - create super item
 " MARKING
@@ -19,8 +19,10 @@
 " ,t - add/update timestamp on item
 " ,r - (visual line) sort highlighted items
 " ,r - (normal) sort entire file
-" :Lsearch <mark> - find all items with <mark> (e.g.: =, 1, -, etc.) using location list
+" :Lsearch mark <mark> - find all items with <mark> (e.g.: =, 1, -, etc.) using location list
+"          tag <tag> - find all items with <tag> using location list
 " :Lcreate <name> - create new list file with <name> (".list" is added automagically)
+" :Ltag <tag> - add tag to current line
 
 " should items have timestamps by default?
 if (!exists("g:listFile_timestamp"))
@@ -46,8 +48,6 @@ if (!exists("g:listFile_ranks"))
 endif
 
 autocmd BufNewFile,BufRead *.list call ListFile()
-com! -nargs=1 Lsearch :call ListMark("<args>")
-com! -nargs=1 Lcreate :call ListCreate("<args>")
 
 " 'install' list features
 fun! ListFile()
@@ -103,23 +103,22 @@ fun! ListFile()
 	nmap <buffer> ,t mz$a [<ESC>:call ListTimestamp()<CR><ESC>`z
 	vmap <buffer> ,r :call ListSortV()<CR>
 	nmap <buffer> ,r :call ListSortAll()<CR>
+
+	com! -nargs=+ -buffer Lsearch :call ListSearch("<args>")
+	com! -nargs=1 -buffer Lcreate :call ListCreate("<args>")
+	com! -nargs=+ -buffer -range Ltag :call ListTagV(<count>,"<args>")
 endfunction
 
-fun! ListSetMark(mark)
-	let @z = a:mark
-	normal mz^dl"zP
-	call ListTimestamp()
-	normal `z
-endfunction
-
-fun! ListSetMarkV(mark)
-	exe "'<,'>s/^\\(\\s\\+\\)./\\1".a:mark."/"
-	nohl
-endfunction
-
-fun! ListMark(mark)
-	exe 'lvimgrep /^\s*'.a:mark.'/ %'
-	lopen
+fun! ListSearch(args)
+	let args = split(a:args,' ')
+	let type = remove(l:args,0)
+	echo l:args
+	let string = join(l:args,' ')
+	if (l:type == 'mark')
+		call ListMark(l:string)
+	elseif (l:type == 'tag')
+		call ListTagSearch(l:string)
+	endif
 endfunction
 
 fun! ListCreate(name)
@@ -145,6 +144,11 @@ endfunction
 fun! ListTimestampString()
 	let @z = ' ['.strftime('%y-%m-%d %H:%M').']'
 endfunction
+
+
+"""
+""" FOLDING
+"""
 
 " return fold line format
 fun! ListFoldLine(linenum)
@@ -185,7 +189,9 @@ fun! ListFoldLevel(linenum)
 endfunction
 
 
+"""
 """ SORTING
+"""
 
 " sort highlighted lines
 fun! ListSortV() range
@@ -275,4 +281,63 @@ endfunction
 " get the depth of the given line
 fun! ListGetDepth(line)
 	return match(a:line,"[^\t]",0)
+endfunction
+
+
+"""
+""" MARKING
+"""
+
+" mark current line
+fun! ListSetMark(mark)
+	let @z = a:mark
+	normal mz^dl"zP
+	call ListTimestamp()
+	normal `z
+endfunction
+
+" mark lines in visual mode
+fun! ListSetMarkV(mark)
+	exe "'<,'>s/^\\(\\s\\+\\)./\\1".a:mark."/"
+	nohl
+endfunction
+
+" find items with mark
+fun! ListMark(mark)
+	exe 'lvimgrep /^\s*'.a:mark.'/ %'
+	lopen
+endfunction
+
+
+"""
+""" TAGGING
+"""
+
+" tag a line
+fun! ListTag(line,tags)
+	let line = getline(a:line)
+	let tags = ' :'.join(split(a:tags,' '),': :').':'
+	let pos = match(l:line,'\[')
+	if (l:pos == -1)
+		let line = l:line.l:tags
+	else
+		let line = strpart(l:line,0,l:pos-1).l:tags.strpart(l:line,l:pos-1)
+	endif
+	call setline(a:line,l:line)
+endfunction
+
+" tag lines in visual mode
+fun! ListTagV(count,tags) range
+	let start = 0
+	let end = a:count - 1
+	while (l:start < l:end)
+		call ListTag(line('.')+l:start,a:tags)
+		let start = l:start + 1
+	endwhile
+endfunction
+
+" search for tag
+fun! ListTagSearch(string)
+	exe 'lvimgrep /:'.a:string.':/ %'
+	lopen
 endfunction
