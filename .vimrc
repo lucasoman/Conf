@@ -340,8 +340,9 @@ fun! CleverTab()
 	else
 		"return "\<C-X>\<C-O>"
 		return "\<C-P>"
+	endif
 endfunction
-inoremap <Tab> <C-R>=CleverTab()<CR>
+imap <Tab> <C-R>=CleverTab()<CR>
 "}}}
 "CODE GREP {{{
 " grep for given string (second is case insensitive)

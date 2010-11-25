@@ -5,6 +5,7 @@
 " Commands and shortcuts:
 " CREATING
 " ,n - create new item
+" <tab> - create new item
 " ,s - create sub item
 " ,u - create super item
 " MARKING
@@ -99,7 +100,8 @@ fun! ListFile()
 	nmap <buffer> ,5 :call ListSetMark('5')<CR>
 	" add/update [t]imestamp
 	nmap <buffer> ,t mz$a [<ESC>:call ListTimestamp()<CR><ESC>`z
-	vmap <buffer> ,r :call ListSort()<CR>
+	vmap <buffer> ,r :call ListSortV()<CR>
+	nmap <buffer> ,r :call ListSortAll()<CR>
 endfunction
 
 fun! ListSetMark(mark)
@@ -172,7 +174,7 @@ fun! ListFoldLevel(linenum)
 	endif
 	if a:linenum > 1
 		s:pline = getline(a:linenum-1)
-		s:pnumtabs = match(s:pline,"[^\t]",0)
+		s:pnumtabs = ListGetDepth(s:pline)
 		if s:level < s:pnumtabs
 		" if this is higher level than prev, start a new fold
 			let s:prefix = '>'
@@ -181,17 +183,76 @@ fun! ListFoldLevel(linenum)
 	return s:prefix.s:level
 endfunction
 
+
+""" SORTING
+
 " sort highlighted lines
-fun! ListSort() range
-	let lines = getline(a:firstline,a:lastline)
-	let sorted = sort(l:lines,"ListSortFunction")
-	call setline(a:firstline,l:sorted)
+fun! ListSortV() range
+	call ListSort(a:firstline,a:lastline)
+endfunction
+
+" sort whole file
+fun! ListSortAll()
+	call ListSort(1,line('$'))
+endfunction
+
+" sort range of lines
+fun! ListSort(start,end)
+	let s:sortLines = getline(a:start,a:end)
+	let s:sortDict = {0:[]}
+	let depth = ListGetDepth(s:sortLines[0])
+	call ListDictFormat([0],l:depth,1)
+	let sorted = ListCompileSorted(0)
+	call setline(a:start,l:sorted)
+endfunction
+
+" construct sorted list string from sortDict
+fun! ListCompileSorted(index)
+	let list = get(s:sortDict,a:index,[])
+	if (!empty(l:list))
+		let sorted = sort(s:sortDict[a:index],"ListSortFunction")
+		let allSorted = []
+		for item in l:sorted
+			call add(l:allSorted,item[1])
+			let sublist = ListCompileSorted(item[0])
+			if (sublist != [])
+				call extend(l:allSorted,l:sublist)
+			endif 
+		endfor
+		return l:allSorted
+	else
+		return []
+	endif
+endfunction
+
+fun! ListDictFormat(stack,depth,index)
+	if (len(s:sortLines) == 0)
+		return
+	endif
+	let index = a:index + 1
+	let line = remove(s:sortLines,0)
+	let depth = ListGetDepth(l:line)
+	if (l:depth > a:depth) " we're starting a sub-list
+		" add prev index to stack because it's now a parent
+		call add(a:stack,a:index)
+		" create empty list in dictionary
+		let s:sortDict[a:index] = []
+	elseif (l:depth < a:depth) " we're ending sub-list(s)
+		" pop the stack as many times as necessary
+		let diff = a:depth - l:depth
+		while (l:diff > 0)
+			call remove(a:stack,len(a:stack)-1)
+			let diff = l:diff - 1
+		endwhile
+	endif
+	call add(s:sortDict[a:stack[len(a:stack) - 1]],[l:index,l:line])
+	call ListDictFormat(a:stack,l:depth,l:index)
 endfunction
 
 " sorting function
 fun! ListSortFunction(one,two)
-	let onerank = ListGetItemRank(a:one)
-	let tworank = ListGetItemRank(a:two)
+	let onerank = ListGetItemRank(a:one[1])
+	let tworank = ListGetItemRank(a:two[1])
 	return l:onerank == l:tworank ? 0 : l:onerank < l:tworank ? -1 : 1
 endfunction
 
@@ -200,4 +261,9 @@ fun! ListGetItemRank(line)
 	let matches = matchlist(a:line,'^\s*\(\S\+\)')
 	let mark = l:matches[1]
 	return g:listFile_ranks[l:mark]
+endfunction
+
+" get the depth of the given line
+fun! ListGetDepth(line)
+	return match(a:line,"[^\t]",0)
 endfunction
