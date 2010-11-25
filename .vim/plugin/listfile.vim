@@ -329,7 +329,7 @@ endfunction
 " tag lines in visual mode
 fun! ListTagV(count,tags) range
 	let start = 0
-	let end = a:count - 1
+	let end = a:count > 0 ? a:count - 1 : 1
 	while (l:start < l:end)
 		call ListTag(line('.')+l:start,a:tags)
 		let start = l:start + 1
