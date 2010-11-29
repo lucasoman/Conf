@@ -60,6 +60,8 @@ fun! ListFile()
 	setl foldtext=ListFoldLine()
 	setl noshowmatch
 	setl cindent
+	setl listchars=tab:\|\ ,trail:-
+	setl list
 	" map all the magic shortcuts
 	if (g:listFile_timestamp == 1)
 		" add [n]ew item below current
@@ -153,12 +155,17 @@ endfunction
 " return fold line format
 fun! ListFoldLine()
 	let s:count = 1
-	let s:spaces = ''
-	while s:count <= &shiftwidth
+	let s:spaces = '|'
+	while s:count < &shiftwidth
 		let s:spaces = s:spaces.' '
 		let s:count = s:count + 1
 	endwhile
-	return substitute(getline(v:foldstart),"\t",s:spaces,'g')
+	let numLines = v:foldend - v:foldstart
+	let foldLine = substitute(getline(v:foldstart)." (".l:numLines.")","\t",s:spaces,'g')
+	if (winwidth(0) > strlen(foldLine))
+		let foldLine = l:foldLine.repeat(' ',winwidth(0) - strlen(foldLine))
+	endif
+	return l:foldLine
 endfunction
 
 " foldexpr function
