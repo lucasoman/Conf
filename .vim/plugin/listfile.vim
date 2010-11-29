@@ -23,6 +23,11 @@
 "          tag <tag> - find all items with <tag> using location list
 " :Lcreate <name> - create new list file with <name> (".list" is added automagically)
 " :Ltag <tag> - add tag to current line
+" :Lmark <mark> - (normal or visual line) mark item(s) with <mark>
+
+"""
+""" CONFIGURABLE OPTIONS
+"""
 
 " should items have timestamps by default?
 if (!exists("g:listFile_timestamp"))
@@ -32,36 +37,42 @@ endif
 if (!exists("g:listFile_indent"))
 	let listFile_indent = 4
 endif
+" sort order for item marks
 if (!exists("g:listFile_ranks"))
-	let listFile_ranks = {
-		\'1':0,
-		\'2':1,
-		\'3':2,
-		\'4':3,
-		\'5':4,
-		\'=':5,
-		\'o':6,
-		\'-':7,
-		\'?':8,
-		\'x':9
-	\}
+	let g:listFile_ranks = ['1','2','3','4','5','=','o','-','?','x']
 endif
 
+"""
+""" END CONFIGURABLE OPTIONS
+"""
+
+let s:ranks = {}
 autocmd BufNewFile,BufRead *.list call ListFile()
 
 " 'install' list features
 fun! ListFile()
 	setfiletype listfile
-	" set some options
+
+	" we want our own folding stuff
 	setl foldmethod=expr
 	setl foldexpr=ListFoldLevel(v:lnum)
+	setl foldtext=ListFoldLine()
+	
+	" set the configured tabbing options
 	exe 'setlocal shiftwidth='.g:listFile_indent
 	exe 'setlocal tabstop='.g:listFile_indent
-	setl foldtext=ListFoldLine()
-	setl noshowmatch
-	setl cindent
+
+	" make indentation look like list view
 	setl listchars=tab:\|\ ,trail:-
 	setl list
+
+	" don't show matching brackets
+	setl noshowmatch
+	" automatic indentation
+	setl cindent
+	" don't wrap long lines (cleans up display)
+	setl nowrap
+
 	" map all the magic shortcuts
 	if (g:listFile_timestamp == 1)
 		" add [n]ew item below current
@@ -81,26 +92,26 @@ fun! ListFile()
 	imap <buffer> <tab> <ESC>,n
 	nmap <buffer> <tab> ,n
 	" mark item as [x]
-	nmap <buffer> ,x :call ListSetMark('x')<CR>
-	vmap <buffer> ,x :call ListSetMarkV('x')<CR>
+	nmap <buffer> ,x :Lmark x<CR>
+	vmap <buffer> ,x :Lmark x<CR>
 	" mark item as [-]
-	nmap <buffer> ,- :call ListSetMark('-')<CR>
-	vmap <buffer> ,- :call ListSetMarkV('\-')<CR>
+	nmap <buffer> ,- :Lmark -<CR>
+	vmap <buffer> ,- :Lmark -<CR>
 	" mark item as = (in [p]rogress)
-	nmap <buffer> ,p :call ListSetMark('=')<CR>
-	vmap <buffer> ,p :call ListSetMarkV('=')<CR>
+	nmap <buffer> ,p :Lmark =<CR>
+	vmap <buffer> ,p :Lmark =<CR>
 	" mark item as [o]
-	nmap <buffer> ,o :call ListSetMark('o')<CR>
-	vmap <buffer> ,o :call ListSetMarkV('o')<CR>
+	nmap <buffer> ,o :Lmark o<CR>
+	vmap <buffer> ,o :Lmark o<CR>
 	" mark item as [?]
-	nmap <buffer> ,? :call ListSetMark('?')<CR>
-	vmap <buffer> ,? :call ListSetMarkV('?')<CR>
+	nmap <buffer> ,? :Lmark ?<CR>
+	vmap <buffer> ,? :Lmark ?<CR>
 	" mark item with a priority
-	nmap <buffer> ,1 :call ListSetMark('1')<CR>
-	nmap <buffer> ,2 :call ListSetMark('2')<CR>
-	nmap <buffer> ,3 :call ListSetMark('3')<CR>
-	nmap <buffer> ,4 :call ListSetMark('4')<CR>
-	nmap <buffer> ,5 :call ListSetMark('5')<CR>
+	nmap <buffer> ,1 :Lmark 1<CR>
+	nmap <buffer> ,2 :Lmark 2<CR>
+	nmap <buffer> ,3 :Lmark 3<CR>
+	nmap <buffer> ,4 :Lmark 4<CR>
+	nmap <buffer> ,5 :Lmark 5<CR>
 	" add/update [t]imestamp
 	nmap <buffer> ,t mz$a [<ESC>:call ListTimestamp()<CR><ESC>`z
 	vmap <buffer> ,r :call ListSortV()<CR>
@@ -109,6 +120,7 @@ fun! ListFile()
 	com! -nargs=+ -buffer Lsearch :call ListSearch("<args>")
 	com! -nargs=1 -buffer Lcreate :call ListCreate("<args>")
 	com! -nargs=+ -buffer -range Ltag :call ListTagV(<count>,"<args>")
+	com! -nargs=1 -buffer -range Lmark :call ListSetMark(<count>,"<args>")
 endfunction
 
 fun! ListSearch(args)
@@ -173,8 +185,8 @@ fun! ListFoldLevel(linenum)
 	let s:prefix = ''
 	let s:myline = getline(a:linenum)
 	let s:nextline = getline(a:linenum+1)
-	let s:mynumtabs = match(s:myline,"[^\t]",0)
-	let s:nextnumtabs = match(s:nextline,"[^\t]",0)
+	let s:mynumtabs = ListGetDepth(s:myline)
+	let s:nextnumtabs = ListGetDepth(s:nextline)
 	if s:nextnumtabs > s:mynumtabs " if this item has sub-items
 		let s:level = s:nextnumtabs
 	else " next item is either same or higher level
@@ -227,6 +239,7 @@ endfunction
 
 " construct sorted list string from sortDict
 fun! ListCompileSorted(index)
+	call ListConvertRanks()
 	let list = get(s:sortDict,a:index,[])
 	if (!empty(l:list))
 		let sorted = sort(s:sortDict[a:index],"ListSortFunction")
@@ -278,11 +291,20 @@ fun! ListSortFunction(one,two)
 	return l:onerank == l:tworank ? 0 : l:onerank < l:tworank ? -1 : 1
 endfunction
 
+"converts ranks to usable dictionary
+fun! ListConvertRanks()
+	let i = 0
+	for rank in g:listFile_ranks
+		let s:ranks[rank] = l:i
+		let i = l:i + 1
+	endfor
+endfunction
+
 " get rank for the given line based on user-defined mark ranks
 fun! ListGetItemRank(line)
 	let matches = matchlist(a:line,'^\s*\(\S\+\)')
 	let mark = l:matches[1]
-	return g:listFile_ranks[l:mark]
+	return s:ranks[l:mark]
 endfunction
 
 " get the depth of the given line
@@ -296,17 +318,16 @@ endfunction
 """
 
 " mark current line
-fun! ListSetMark(mark)
-	let @z = a:mark
-	normal mz^dl"zP
-	call ListTimestamp()
-	normal `z
-endfunction
-
-" mark lines in visual mode
-fun! ListSetMarkV(mark)
-	exe "'<,'>s/^\\(\\s\\+\\)./\\1".a:mark."/"
-	nohl
+fun! ListSetMark(end,mark)
+	if (a:end > 0)
+		exe "'<,'>s/^\\(\\s\\+\\)./\\1".a:mark."/"
+		nohl
+	else
+		let @z = strpart(a:mark,0,1)
+		normal mz^dl"zP
+		call ListTimestamp()
+		normal `z
+	endif
 endfunction
 
 " find items with mark
