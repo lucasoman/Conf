@@ -5,8 +5,9 @@
 " Commands and shortcuts:
 " CREATING
 " ,n - create new item
-" <tab> - (insert or normal) create new item
+" <enter> - (insert or normal) create new item
 " ,s - create sub item
+" <tab> - (insert or normal) create sub-item
 " ,u - create super item
 " MARKING
 " ,p - mark item with '=' (in progress)
@@ -89,8 +90,10 @@ fun! ListFile()
 		" add new super item below current
 		nmap <buffer> ,u o- <ESC><<^la
 	endif
-	imap <buffer> <tab> <ESC>,n
-	nmap <buffer> <tab> ,n
+	imap <buffer> <tab> <ESC>,s
+	nmap <buffer> <tab> ,s
+	imap <buffer> <cr> <ESC>,n
+	nmap <buffer> <cr> ,n
 	" mark item as [x]
 	nmap <buffer> ,x :Lmark x<CR>
 	vmap <buffer> ,x :Lmark x<CR>
