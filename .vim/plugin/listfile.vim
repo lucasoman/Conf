@@ -47,6 +47,7 @@ endif
 """ END CONFIGURABLE OPTIONS
 """
 
+
 let s:ranks = {}
 autocmd BufNewFile,BufRead *.list call ListFile()
 
@@ -64,7 +65,7 @@ fun! ListFile()
 	exe 'setlocal tabstop='.g:listFile_indent
 
 	" make indentation look like list view
-	setl listchars=tab:\|\ ,trail:-
+	setl listchars=tab:\|\ 
 	setl list
 
 	" don't show matching brackets
@@ -307,7 +308,7 @@ endfunction
 fun! ListGetItemRank(line)
 	let matches = matchlist(a:line,'^\s*\(\S\+\)')
 	let mark = l:matches[1]
-	return s:ranks[l:mark]
+	return get(s:ranks,l:mark,1000)
 endfunction
 
 " get the depth of the given line
