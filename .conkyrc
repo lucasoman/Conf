@@ -1,4 +1,4 @@
-alignment tm
+alignment tr
 background no
 own_window yes
 own_window_hints sticky undecorated below skip_taskbar
