@@ -23,7 +23,7 @@
 " :Lsearch mark <mark> - find all items with <mark> (e.g.: =, 1, -, etc.) using location list
 "          tag <tag> - find all items with <tag> using location list
 " :Lcreate <name> - create new list file with <name> (".list" is added automagically)
-" :Ltag <tag> - add tag to current line
+" :Ltag <tag> [tag ...] - (normal or visual line) add tag(s) to line(s) (has autocomplete)
 " :Lmark <mark> - (normal or visual line) mark item(s) with <mark>
 
 """
@@ -40,7 +40,7 @@ if (!exists("g:listFile_indent"))
 endif
 " sort order for item marks
 if (!exists("g:listFile_ranks"))
-	let g:listFile_ranks = ['1','2','3','4','5','=','o','-','?','x']
+	let g:listFile_ranks = ['=','1','2','3','4','5','o','-','?','x']
 endif
 
 """
