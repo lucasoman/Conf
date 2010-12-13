@@ -23,7 +23,8 @@
 " :Lsearch mark <mark> - find all items with <mark> (e.g.: =, 1, -, etc.) using location list
 "          tag <tag> - find all items with <tag> using location list
 " :Lcreate <name> - create new list file with <name> (".list" is added automagically)
-" :Ltag <tag> [tag ...] - (normal or visual line) add tag(s) to line(s) (has autocomplete)
+" :Ltag <tag> [tag ...] - (normal or visual line) add tag(s) to line(s) (has tab complete)
+" :Ltagr <tag> [tag ...] - (normal or visual line) remove tag(s) from line(s) (has tab complete)
 " :Lmark <mark> - (normal or visual line) mark item(s) with <mark>
 
 """
@@ -124,6 +125,7 @@ fun! ListFile()
 	com! -nargs=+ -buffer Lsearch :call ListSearch("<args>")
 	com! -nargs=1 -buffer Lcreate :call ListCreate("<args>")
 	com! -nargs=+ -buffer -range -complete=customlist,ListTagComplete Ltag :call ListTagV(<count>,"<args>")
+	com! -nargs=+ -buffer -range -complete=customlist,ListTagComplete Ltagr :call ListTagRV(<count>,"<args>")
 	com! -nargs=1 -buffer -range Lmark :call ListSetMark(<count>,"<args>")
 
 	let b:tags = {}
@@ -364,12 +366,32 @@ fun! ListTag(line,tags)
 	endfor
 endfunction
 
+" remove tag from line
+fun! ListTagR(line,tags)
+	let line = getline(a:line)
+	let tags = split(a:tags,' ')
+	for tagString in l:tags
+		let line = substitute(l:line,'\s\=:'.tagString.':','','')
+	endfor
+	call setline(a:line,l:line)
+endfunction
+
 " tag lines in visual mode
 fun! ListTagV(end,tags) range
 	let start = line('.')
 	let end = a:end > 0 ? a:end : line('.')
 	while (l:start <= l:end)
 		call ListTag(l:start,a:tags)
+		let start = l:start + 1
+	endwhile
+endfunction
+
+" remove tags in visual mode
+fun! ListTagRV(end,tags) range
+	let start = line('.')
+	let end = a:end > 0 ? a:end : line('.')
+	while (l:start <= l:end)
+		call ListTagR(l:start,a:tags)
 		let start = l:start + 1
 	endwhile
 endfunction
