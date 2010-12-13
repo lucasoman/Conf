@@ -123,8 +123,11 @@ fun! ListFile()
 
 	com! -nargs=+ -buffer Lsearch :call ListSearch("<args>")
 	com! -nargs=1 -buffer Lcreate :call ListCreate("<args>")
-	com! -nargs=+ -buffer -range Ltag :call ListTagV(<count>,"<args>")
+	com! -nargs=+ -buffer -range -complete=customlist,ListTagComplete Ltag :call ListTagV(<count>,"<args>")
 	com! -nargs=1 -buffer -range Lmark :call ListSetMark(<count>,"<args>")
+
+	let b:tags = {}
+	call ListTagCompileIndex()
 endfunction
 
 fun! ListSearch(args)
@@ -356,6 +359,9 @@ fun! ListTag(line,tags)
 		let line = strpart(l:line,0,l:pos-1).l:tags.strpart(l:line,l:pos-1)
 	endif
 	call setline(a:line,l:line)
+	for tagString in split(a:tags,' ')
+		let b:tags[tagString] = 'x'
+	endfor
 endfunction
 
 " tag lines in visual mode
@@ -372,4 +378,30 @@ endfunction
 fun! ListTagSearch(string)
 	exe 'lvimgrep /:'.a:string.':/ %'
 	lopen
+endfunction
+
+" compile tag index
+fun! ListTagCompileIndex()
+	for line in getbufline('%',0,'$')
+		let matches = matchlist(line,':\([^\s:]\+\):')
+		if len(l:matches) > 0
+			call remove(l:matches,0)
+			for tagString in l:matches
+				if tagString != ''
+					let b:tags[tagString] = 'x'
+				endif
+			endfor
+		endif
+	endfor
+endfunction
+
+" autocomplete function for tags
+fun! ListTagComplete(argLead,cmdLine,cursorPos)
+	let matches = []
+	for tagString in keys(b:tags)
+		if match(tagString,'^'.a:argLead) >= 0
+			call add(l:matches,tagString)
+		endif
+	endfor
+	return l:matches
 endfunction
