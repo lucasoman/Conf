@@ -313,7 +313,8 @@ endfunction
 fun! ListGetItemRank(line)
 	let matches = matchlist(a:line,'^\s*\(\S\+\)')
 	let mark = l:matches[1]
-	return get(s:ranks,l:mark,1000)
+	let default = 1000 + char2nr(l:mark)
+	return get(s:ranks,l:mark,l:default)
 endfunction
 
 " get the depth of the given line
