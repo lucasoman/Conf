@@ -20,9 +20,9 @@
 " ,t - add/update timestamp on item
 " ,r - (visual line) sort highlighted items
 " ,r - (normal) sort entire file
+" :Lcreate <name> - create new list file in current buffer with <name> (".list" is added automagically)
 " :Lsearch mark <mark> - find all items with <mark> (e.g.: =, 1, -, etc.) using location list
 "          tag <tag> - find all items with <tag> using location list
-" :Lcreate <name> - create new list file with <name> (".list" is added automagically)
 " :Ltag <tag> [tag ...] - (normal or visual line) add tag(s) to line(s) (has tab complete)
 " :Ltagr <tag> [tag ...] - (normal or visual line) remove tag(s) from line(s) (has tab complete)
 " :Lmark <mark> - (normal or visual line) mark item(s) with <mark>
@@ -48,6 +48,7 @@ endif
 """ END CONFIGURABLE OPTIONS
 """
 
+com! -nargs=1 Lcreate :call ListCreate("<args>")
 
 let s:ranks = {}
 autocmd BufNewFile,BufRead *.list call ListFile()
@@ -123,7 +124,6 @@ fun! ListFile()
 	nmap <buffer> ,r :call ListSortAll()<CR>
 
 	com! -nargs=+ -buffer Lsearch :call ListSearch("<args>")
-	com! -nargs=1 -buffer Lcreate :call ListCreate("<args>")
 	com! -nargs=+ -buffer -range -complete=customlist,ListTagComplete Ltag :call ListTagV(<count>,"<args>")
 	com! -nargs=+ -buffer -range -complete=customlist,ListTagComplete Ltagr :call ListTagRV(<count>,"<args>")
 	com! -nargs=1 -buffer -range Lmark :call ListSetMark(<count>,"<args>")
@@ -145,7 +145,7 @@ fun! ListSearch(args)
 endfunction
 
 fun! ListCreate(name)
-	exe 'tabe '.a:name.'.list'
+	exe 'e '.a:name.'.list'
 	let @z = '- '
 	normal "zP
 endfunction
