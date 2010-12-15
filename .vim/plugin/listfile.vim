@@ -33,11 +33,11 @@
 
 " should items have timestamps by default?
 if (!exists("g:listFile_timestamp"))
-	let listFile_timestamp = 0
+	let g:listFile_timestamp = 0
 endif
 " how far should each level indent?
 if (!exists("g:listFile_indent"))
-	let listFile_indent = 4
+	let g:listFile_indent = 4
 endif
 " sort order for item marks
 if (!exists("g:listFile_ranks"))
