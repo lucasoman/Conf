@@ -76,6 +76,7 @@ fun! ListFile()
 	setl cindent
 	" don't wrap long lines (cleans up display)
 	setl nowrap
+	setl tw=0
 
 	" map all the magic shortcuts
 	if (g:listFile_timestamp == 1)
