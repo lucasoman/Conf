@@ -1,6 +1,11 @@
+" Syntax file for List File plugin
+" by Lucas Oman <me@lucasoman.com>
+
 if exists("b:current_syntax")
 	finish
 endif
+
+let b:current_syntax = "listfile"
 
 syn match listFilePriOne '^\s*1 [^\[\]:]*'
 syn match listFilePriTwo '^\s*2 [^\[\]:]*'
@@ -11,8 +16,6 @@ syn match listFileUnk '^\s*o [^\[\]:]*'
 syn match listFileDone '^\s*x [^\[\]:]*'
 syn match listFileDate '\[[^\]]\+\]$'
 syn match listFileTag ':\S\+:'
-
-let b:current_syntax = "listfile"
 
 hi def listFileNonStart ctermfg=NONE cterm=bold
 hi def listFilePriOne ctermfg=1 cterm=bold
