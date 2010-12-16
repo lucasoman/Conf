@@ -1,5 +1,4 @@
 " Allows you to manage multiple session files for different projects.
-" Use vim's :mksession [filename] command to create a session.
 " Commands and shortcuts:
 " :Nwhich - display name of currently used session file
 " :Nload - load a session file
@@ -22,6 +21,10 @@ autocmd VimLeave * call SaveSession()
 
 " open current dir to select a session file
 fun! LoadSession()
+	if s:sessionloaded == 1
+		echo "Session already loaded. Restart vim to load different session."
+		return
+	endif
 	" save current netrw sort sequence
 	let s:netrwsort = g:netrw_sort_sequence
 	" show sessions first, then dirs
