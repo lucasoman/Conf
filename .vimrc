@@ -257,6 +257,17 @@ nmap <F7> :!updatedev.php %:p<CR>
 nmap <F8> :call WriteTrace()<CR>
 nmap <F9> \ph
 " }}}
+"{{{ list file
+let g:listFile_ranks = ['=','1','2','3','4','5','!','o','-','?','x']
+autocmd BufNewFile,BufRead *.list call MyListFileStuff()
+fun! MyListFileStuff()
+	nmap <buffer> ,! :Lmark !<CR>
+	vmap <buffer> ,! :Lmark !<CR>
+	nmap <buffer> ,tq :Ltag quick<CR>
+	vmap <buffer> ,tq :Ltag quick<CR>
+	nmap <buffer> ,sq :Lsearch tag quick<CR>
+endfunction
+"}}}
 
 " minor helpful stuff
 fun! ToggleColumns() "{{{
