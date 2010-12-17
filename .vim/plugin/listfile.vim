@@ -331,7 +331,7 @@ endfunction
 " mark current line
 fun! ListSetMark(end,mark)
 	if (a:end > 0)
-		exe "'<,'>s/^\\(\\s\\+\\)./\\1".a:mark."/"
+		exe "'<,'>s/^\\(\\s*\\)./\\1".a:mark."/"
 		nohl
 	else
 		let @z = strpart(a:mark,0,1)
