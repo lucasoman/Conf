@@ -1,6 +1,6 @@
 " Allows you to manage multiple session files for different projects.
 " Commands and shortcuts:
-" :Nwhich - display name of currently used session file
+" :Nwhich - display name of currently loaded session file
 " :Nload - load a session file
 " :Ncreate <name> - create a new session with <name>. ".vim" extension is added automagically
 
@@ -12,10 +12,12 @@ com! -nargs=1 Ncreate :call CreateSession("<args>")
 " for some reason, new session loading code fails to set filetype of files in session
 set sessionoptions=blank,tabpages,folds,localoptions
 
-let s:sessionloaded = 0
-let s:loadingsession = 0
-let s:sessionfile = ''
-let s:netrwsort = ''
+if (!exists("s:sessionloaded"))
+	let s:sessionloaded = 0
+	let s:loadingsession = 0
+	let s:sessionfile = ''
+	let s:netrwsort = ''
+endif
 autocmd BufRead *.vim call LoadSessionFinish()
 autocmd VimLeave * call SaveSession()
 
