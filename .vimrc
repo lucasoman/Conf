@@ -1,4 +1,4 @@
-" vim: fdm=marker:commentstring="%s
+" vim: fdm=marker:
 " Recommended for vim >= 7; no guarantee of compatibility with earlier versions
 " Lucas Oman <me@lucasoman.com>
 " --enable-rubyinterp --prefix=/usr --enable-ruby
@@ -192,7 +192,7 @@ let mapleader = "\\"
 " easier move screen up/down
 nmap <C-j> <C-e>
 nmap <C-k> <C-y>
-" turns of highlighting
+" turns off highlighting
 nmap <Leader>/ :nohl<CR>
 " search for highlighted text
 vmap // y/<C-R>"<CR>
@@ -210,8 +210,10 @@ nmap <Leader>l :60vsplit ~/projects.list<CR>
 nmap <Leader>ss :syntax sync fromstart<CR>
 " open local journal file
 nmap <Leader>j :60vsplit ~/journal.log<CR>G
+" toggle the tag list
 nmap <Leader>tl :TlistToggle<CR>
 " make arrow keys useful
+" use them to swap between split windows
 nmap <left> <C-W>h
 nmap <right> <C-W>l
 nmap <up> <C-W>k
@@ -233,15 +235,19 @@ nmap <Leader>cv o/**<CR><CR><CR>@var <CR><BS>/<ESC>kkk$a
 nmap <Leader>cp o/**<CR><CR><CR>@author Lucas Oman <me@lucasoman.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
 "}}}
 " svn {{{
-nmap <Leader>sc :!svnconsole.php<CR><CR>
+" set svn keywords
 nmap <Leader>sk :!svn propset svn:keywords "Rev Date Id Author HeadURL" %<CR>
 nmap <Leader>sp :call SvnPushFile()<CR>
 com! -nargs=1 Sstat :call SvnStatus("<args>")
+
+" view status of given path
 fun! SvnStatus(path)
 	tabe
 	setl buftype=nofile
 	exe "r !svn st ".a:path
 endfunction
+
+" call script to copy file to appropriate location in htdocs
 fun! SvnPushFile()
 	let line = getline('.')
 	let file = strpart(l:line,8)
@@ -252,10 +258,15 @@ endfunction
 nmap <F2> :call ToggleColumns()<CR>
 imap <F2> <C-o>:call ToggleColumns()<CR>
 nmap <F3> :Nload<CR>
+" <F4>
 set pastetoggle=<F5>
+" <F6>
 nmap <F7> :!updatedev.php %:p<CR>
 nmap <F8> :call WriteTrace()<CR>
 nmap <F9> \ph
+" <F10>
+" <F11> don't use; terminal full-screen
+" <F12>
 " }}}
 "{{{ list file
 let g:listFile_ranks = ['=','1','2','3','4','5','!','o','-','?','x']
