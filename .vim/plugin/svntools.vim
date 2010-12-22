@@ -89,7 +89,7 @@ fun! SvnModeWindow(file)
 		let which = l:which - 1
 	endif
 	if !SvnMode()
-		tabe
+		tabe 'SVN-'.substitute(a:file,'.*/','','')
 		let file = a:file
 	else
 		let file = w:svnFile
