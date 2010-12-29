@@ -122,6 +122,7 @@ fun! SvnModeDiff(rev)
 		if l:num =~ ':'
 			let option = '-r'
 		else
+			exe "r !svn log -v -r ".l:num." ".l:file
 			let option = '-c'
 		endif
 		exe "r !svn diff ".l:option." ".l:num." ".l:file
