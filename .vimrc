@@ -464,7 +464,8 @@ fun! DbExecuteV() range
 	call DbExecuteQuery(l:query)
 endfunction
 fun! DbExecuteQuery(query)
-	tabe
+	new
+	normal R
 	setl buftype=nofile
 	setfiletype mysqlresult
 	let query = escape(shellescape(a:query),'%')
