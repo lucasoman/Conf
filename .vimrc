@@ -449,7 +449,7 @@ endfunction
 "{{{ MYSQL MODE
 com! -nargs=0 Dbopen :call DbOpen()
 fun! DbOpen()
-	tabe MySQL
+	tabe DB
 	setl filetype=mysql
 	setl buftype=nofile
 	nmap <buffer> <CR> :call DbExecute()<CR>
