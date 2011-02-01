@@ -23,10 +23,18 @@ com! Sblame :call SvnBlame(bufname('%'))
 com! -nargs=? Sdiffs :call SvnDiffSplit(expand('%:h'),expand('%:t'),"<args>")
 com! -nargs=? Srev :call SvnModeDiff("<args>")
 com! -nargs=? Swin :call SvnModeWindow("<args>")
+com! -nargs=? Scl :call SvnChangeList("<args>",bufname('%'))
 " view diff for file at revision under cursor
 nmap <Leader>sr :call SvnModeDiff(expand('<cword>'))<CR>gg
 nmap <Leader>sf :call SvnModeExport()<CR>gg
+nmap <Leader>sa :call SvnAdd(bufname('%'))<CR>
 
+fun! SvnChangeList(clname,file)
+	exe "!svn cl ".a:clname." ".a:file
+endfunction
+fun! SvnAdd(file)
+	exe "!svn add ".a:file
+endfunction
 fun! SvnDiff(args,file)
 	let argList = split(a:args,' ')
 	if (empty(l:argList))
@@ -122,6 +130,7 @@ fun! SvnModeDiff(rev)
 		if l:num =~ ':'
 			let option = '-r'
 		else
+			exe "r !svn log -v -r ".l:num." ".l:file
 			let option = '-c'
 		endif
 		exe "r !svn diff ".l:option." ".l:num." ".l:file

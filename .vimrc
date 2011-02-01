@@ -448,8 +448,11 @@ endfunction
 "}}}
 "{{{ MYSQL MODE
 com! -nargs=0 Dbopen :call DbOpen()
+if (!exists("g:db_window_count"))
+	let db_window_count = 0
+endif
 fun! DbOpen()
-	tabe MySQL
+	tabe DB
 	setl filetype=mysql
 	setl buftype=nofile
 	nmap <buffer> <CR> :call DbExecute()<CR>
@@ -464,7 +467,9 @@ fun! DbExecuteV() range
 	call DbExecuteQuery(l:query)
 endfunction
 fun! DbExecuteQuery(query)
-	tabe
+	let g:db_window_count = g:db_window_count + 1
+	exe 'new DB-'.g:db_window_count
+	normal R
 	setl buftype=nofile
 	setfiletype mysqlresult
 	let query = escape(shellescape(a:query),'%')
