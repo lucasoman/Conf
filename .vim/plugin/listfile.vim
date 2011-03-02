@@ -54,7 +54,7 @@ let s:ranks = {}
 autocmd BufNewFile,BufRead *.list call ListFile()
 
 " 'install' list features
-fun! ListFile()
+fun! ListFile() "{{{
 	setfiletype listfile
 
 	" we want our own folding stuff
@@ -131,9 +131,9 @@ fun! ListFile()
 
 	let b:tags = {}
 	call ListTagCompileIndex()
-endfunction
+endfunction "}}}
 
-fun! ListSearch(args)
+fun! ListSearch(args) "{{{
 	let args = split(a:args,' ')
 	let type = remove(l:args,0)
 	echo l:args
@@ -143,16 +143,16 @@ fun! ListSearch(args)
 	elseif (l:type == 'tag')
 		call ListTagSearch(l:string)
 	endif
-endfunction
+endfunction "}}}
 
-fun! ListCreate(name)
+fun! ListCreate(name) "{{{
 	exe 'e '.a:name.'.list'
 	let @z = '- '
 	normal "zP
-endfunction
+endfunction "}}}
 
 " fix properly formatted timestamp
-fun! ListTimestamp()
+fun! ListTimestamp() "{{{
 	let addStamp = 0
 	if getline('.') =~ '\['
 		let addStamp = 1
@@ -162,12 +162,12 @@ fun! ListTimestamp()
 		call ListTimestampString()
 		normal "zp
 	endif
-endfunction
+endfunction "}}}
 
 " return actual timestamp string
-fun! ListTimestampString()
+fun! ListTimestampString() "{{{
 	let @z = ' ['.strftime('%y-%m-%d %H:%M').']'
-endfunction
+endfunction "}}}
 
 
 """
@@ -175,7 +175,7 @@ endfunction
 """
 
 " return fold line format
-fun! ListFoldLine()
+fun! ListFoldLine() "{{{
 	let s:count = 1
 	let s:spaces = '|'
 	while s:count < &shiftwidth
@@ -188,10 +188,10 @@ fun! ListFoldLine()
 		let foldLine = l:foldLine.repeat(' ',winwidth(0) - strlen(foldLine))
 	endif
 	return l:foldLine
-endfunction
+endfunction "}}}
 
 " foldexpr function
-fun! ListFoldLevel(linenum)
+fun! ListFoldLevel(linenum) "{{{
 	let s:prefix = ''
 	let s:myline = getline(a:linenum)
 	let s:nextline = getline(a:linenum+1)
@@ -215,7 +215,7 @@ fun! ListFoldLevel(linenum)
 		endif
 	endif
 	return s:prefix.s:level
-endfunction
+endfunction "}}}
 
 
 """
@@ -223,17 +223,17 @@ endfunction
 """
 
 " sort highlighted lines
-fun! ListSortV() range
+fun! ListSortV() range "{{{
 	call ListSort(a:firstline,a:lastline)
-endfunction
+endfunction "}}}
 
 " sort whole file
-fun! ListSortAll()
+fun! ListSortAll() "{{{
 	call ListSort(1,line('$'))
-endfunction
+endfunction "}}}
 
 " sort range of lines
-fun! ListSort(start,end)
+fun! ListSort(start,end) "{{{
 	let s:sortLines = getline(a:start,a:end)
 	let s:sortDict = {0:[]}
 
@@ -245,10 +245,10 @@ fun! ListSort(start,end)
 	endwhile
 	let sorted = ListCompileSorted(0)
 	call setline(a:start,l:sorted)
-endfunction
+endfunction "}}}
 
 " construct sorted list string from sortDict
-fun! ListCompileSorted(index)
+fun! ListCompileSorted(index) "{{{
 	call ListConvertRanks()
 	let list = get(s:sortDict,a:index,[])
 	if (!empty(l:list))
@@ -265,11 +265,11 @@ fun! ListCompileSorted(index)
 	else
 		return []
 	endif
-endfunction
+endfunction "}}}
 
 " put entire list in dictionary format for sorting
 " this cannot be recursive, as any list file with lines > maxfuncdepth could be sorted
-fun! ListDictFormat()
+fun! ListDictFormat() "{{{
 	if (len(s:sortLines) == 0)
 		return 0
 	endif
@@ -292,36 +292,36 @@ fun! ListDictFormat()
 	call add(s:sortDict[s:stack[len(s:stack) - 1]],[s:index + 1,l:line])
 	let s:index = s:index + 1
 	return 1
-endfunction
+endfunction "}}}
 
 " sorting function
-fun! ListSortFunction(one,two)
+fun! ListSortFunction(one,two) "{{{
 	let onerank = ListGetItemRank(a:one[1])
 	let tworank = ListGetItemRank(a:two[1])
 	return l:onerank == l:tworank ? 0 : l:onerank < l:tworank ? -1 : 1
-endfunction
+endfunction "}}}
 
 "converts ranks to usable dictionary
-fun! ListConvertRanks()
+fun! ListConvertRanks() "{{{
 	let i = 0
 	for rank in g:listFile_ranks
 		let s:ranks[rank] = l:i
 		let i = l:i + 1
 	endfor
-endfunction
+endfunction "}}}
 
 " get rank for the given line based on user-defined mark ranks
-fun! ListGetItemRank(line)
+fun! ListGetItemRank(line) "{{{
 	let matches = matchlist(a:line,'^\s*\(\S\+\)')
 	let mark = l:matches[1]
 	let default = 1000 + char2nr(l:mark)
 	return get(s:ranks,l:mark,l:default)
-endfunction
+endfunction "}}}
 
 " get the depth of the given line
-fun! ListGetDepth(line)
+fun! ListGetDepth(line) "{{{
 	return match(a:line,"[^\t]",0)
-endfunction
+endfunction "}}}
 
 
 """
@@ -329,7 +329,7 @@ endfunction
 """
 
 " mark current line
-fun! ListSetMark(end,mark)
+fun! ListSetMark(end,mark) "{{{
 	if (a:end > 0)
 		exe "'<,'>s/^\\(\\s*\\)./\\1".a:mark."/"
 		nohl
@@ -339,13 +339,13 @@ fun! ListSetMark(end,mark)
 		call ListTimestamp()
 		normal `z
 	endif
-endfunction
+endfunction "}}}
 
 " find items with mark
-fun! ListMark(mark)
+fun! ListMark(mark) "{{{
 	exe 'lvimgrep /^\s*'.a:mark.'/ %'
 	lopen
-endfunction
+endfunction "}}}
 
 
 """
@@ -353,7 +353,7 @@ endfunction
 """
 
 " tag a line
-fun! ListTag(line,tags)
+fun! ListTag(line,tags) "{{{
 	let line = getline(a:line)
 	let tags = ' :'.join(split(a:tags,' '),': :').':'
 	let pos = match(l:line,'\[')
@@ -366,46 +366,46 @@ fun! ListTag(line,tags)
 	for tagString in split(a:tags,' ')
 		let b:tags[tagString] = 'x'
 	endfor
-endfunction
+endfunction "}}}
 
 " remove tag from line
-fun! ListTagR(line,tags)
+fun! ListTagR(line,tags) "{{{
 	let line = getline(a:line)
 	let tags = split(a:tags,' ')
 	for tagString in l:tags
 		let line = substitute(l:line,'\s\=:'.tagString.':','','')
 	endfor
 	call setline(a:line,l:line)
-endfunction
+endfunction "}}}
 
 " tag lines in visual mode
-fun! ListTagV(end,tags) range
+fun! ListTagV(end,tags) range "{{{
 	let start = line('.')
 	let end = a:end > 0 ? a:end : line('.')
 	while (l:start <= l:end)
 		call ListTag(l:start,a:tags)
 		let start = l:start + 1
 	endwhile
-endfunction
+endfunction "}}}
 
 " remove tags in visual mode
-fun! ListTagRV(end,tags) range
+fun! ListTagRV(end,tags) range "{{{
 	let start = line('.')
 	let end = a:end > 0 ? a:end : line('.')
 	while (l:start <= l:end)
 		call ListTagR(l:start,a:tags)
 		let start = l:start + 1
 	endwhile
-endfunction
+endfunction "}}}
 
 " search for tag
-fun! ListTagSearch(string)
+fun! ListTagSearch(string) "{{{
 	exe 'lvimgrep /:'.a:string.':/ %'
 	lopen
-endfunction
+endfunction "}}}
 
 " compile tag index
-fun! ListTagCompileIndex()
+fun! ListTagCompileIndex() "{{{
 	for line in getbufline('%',0,'$')
 		let matches = matchlist(line,':\([^\s:]\+\):')
 		if len(l:matches) > 0
@@ -417,10 +417,10 @@ fun! ListTagCompileIndex()
 			endfor
 		endif
 	endfor
-endfunction
+endfunction "}}}
 
 " autocomplete function for tags
-fun! ListTagComplete(argLead,cmdLine,cursorPos)
+fun! ListTagComplete(argLead,cmdLine,cursorPos) "{{{
 	let matches = []
 	for tagString in keys(b:tags)
 		if match(tagString,'^'.a:argLead) >= 0
@@ -428,4 +428,4 @@ fun! ListTagComplete(argLead,cmdLine,cursorPos)
 		endif
 	endfor
 	return l:matches
-endfunction
+endfunction "}}}
