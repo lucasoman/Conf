@@ -47,7 +47,7 @@ fun! SvnDiff(args,file)
 	else
 		let options = ''
 	endif
-	exe "r !svn diff -x --ignore-eol-style -x -b ".l:options.l:file
+	exe "r !svn diff -x -w ".l:options.l:file
 	setlocal filetype=diff
 endfunction
 fun! SvnLog(args,file)
@@ -102,7 +102,7 @@ fun! SvnModeWindow(file)
 		let file = a:file
 	else
 		let file = w:svnFile
-		exe "q"
+"		exe "q"
 		tabe
 	endif
 	exe('tabm '.l:which)
@@ -133,7 +133,7 @@ fun! SvnModeDiff(rev)
 			exe "r !svn log -v -r ".l:num." ".l:file
 			let option = '-c'
 		endif
-		exe "r !svn diff ".l:option." ".l:num." ".l:file
+		exe "r !svn diff -x -w ".l:option." ".l:num." ".l:file
 		setl filetype=diff
 	else
 		call SvnModeError()
