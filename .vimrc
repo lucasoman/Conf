@@ -120,11 +120,11 @@ highlight TabLine ctermfg=4 ctermbg=DarkGray cterm=bold
 highlight TabLineSel ctermfg=7 cterm=none ctermbg=DarkGray
 
 " number column colors
-highlight LineNr cterm=bold ctermbg=DarkGray cterm=none ctermfg=4
+highlight LineNr cterm=none ctermbg=Black ctermfg=4
 
 " fold colors
-highlight Folded cterm=bold ctermbg=DarkGray cterm=none ctermfg=4
-highlight FoldColumn cterm=bold ctermbg=DarkGray cterm=none ctermfg=4
+highlight Folded cterm=none ctermbg=Black ctermfg=4
+highlight FoldColumn cterm=none ctermbg=Black ctermfg=4
 
 " visual mode colors
 highlight Visual ctermbg=7 ctermfg=4
@@ -140,8 +140,8 @@ highlight DiffChange cterm=none ctermbg=none
 highlight DiffText cterm=none ctermbg=DarkGray
 
 " keep cursor column last so it overrides all others
-highlight CursorColumn cterm=bold ctermbg=DarkGray cterm=none
-highlight CursorLine cterm=bold ctermbg=DarkGray cterm=none
+highlight CursorColumn cterm=none ctermbg=Black
+highlight CursorLine cterm=none ctermbg=Black
 
 highlight Search cterm=none ctermbg=7 ctermfg=4
 
