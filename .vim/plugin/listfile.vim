@@ -79,21 +79,12 @@ fun! ListFile() "{{{
 	setl tw=0
 
 	" map all the magic shortcuts
-	if (g:listFile_timestamp == 1)
-		" add [n]ew item below current
-		nmap <buffer> ,n o-  [<ESC>:call ListTimestamp()<CR><ESC>^la
-		" add new sub item below current
-		nmap <buffer> ,s o-  [<ESC>:call ListTimestamp()<CR><ESC>>>^la
-		" add new super item below current
-		nmap <buffer> ,u o-  [<ESC>:call ListTimestamp()<CR><ESC><<^la
-	else
-		" add [n]ew item below current
-		nmap <buffer> ,n o- 
-		" add new sub item below current
-		nmap <buffer> ,s o- <ESC>>>^la
-		" add new super item below current
-		nmap <buffer> ,u o- <ESC><<^la
-	endif
+	" add [n]ew item below current
+	nmap <buffer> ,n :call ListNewItem(0)<CR>a
+	" add new sub item below current
+	nmap <buffer> ,s :call ListNewItem(1)<CR>a
+	" add new super item below current
+	nmap <buffer> ,u :call ListNewItem(-1)<CR>a
 	imap <buffer> <tab> <ESC>,s
 	nmap <buffer> <tab> ,s
 	imap <buffer> <cr> <ESC>,n
@@ -131,6 +122,52 @@ fun! ListFile() "{{{
 
 	let b:tags = {}
 	call ListTagCompileIndex()
+endfunction "}}}
+
+fun! ListNewItem(indent) "{{{
+	" save current line for later
+	let startline = getline('.')
+	let startlinenum = line('.')
+
+	" get mark of current line to re-use
+	let matches = matchlist(l:startline,'^\s*\(\S\+\)')
+	let mark = l:matches[1]
+
+	" should we advance to end of fold before creating item?
+	if (foldlevel(l:startlinenum) > foldlevel(l:startlinenum - 1) || ListGetDepth(l:startline) < ListGetDepth(getline(l:startlinenum - 1))) && a:indent == 0
+		normal j
+		while ListGetDepth(getline('.')) > ListGetDepth(l:startline) && line('.') < line('$')
+			normal j
+		endwhile
+		" we've gone too far UNLESS we've hit the end of the file or we've hit the end, but only by coincidence
+		if line('.') != line('$') || (line('.') == line('$') && ListGetDepth(getline('.')) == ListGetDepth(l:startline) && line('.') != l:startlinenum)
+			normal k
+		endif
+	endif
+
+	" show timestamp or not?
+	if (g:listFile_timestamp == 1)
+		let @z = l:mark."  [\n"
+		normal "zp
+		call ListTimestamp()
+	else
+		let @z = l:mark." \n"
+		normal "zp
+	endif
+
+	" indent as needed, add initial indent
+	let i = a:indent + ListGetDepth(l:startline)
+	while (i < 0)
+		normal <<
+		let i = i + 1
+	endwhile
+	while (i > 0)
+		normal >>
+		let i = i - 1
+	endwhile
+
+	" go back to a convenient location in the line
+	normal ^l
 endfunction "}}}
 
 fun! ListSearch(args) "{{{
