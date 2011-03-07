@@ -7,14 +7,15 @@ endif
 
 let b:current_syntax = "listfile"
 
-syn match listFilePriOne '^\s*1 [^\[\]:]*'
-syn match listFilePriTwo '^\s*2 [^\[\]:]*'
-syn match listFilePriRest '^\s*[3-9] [^\[\]:]*'
-syn match listFileNonStart '^\s*- [^\[\]:]*'
-syn match listFileProg '^\s*= [^\[\]:]*'
-syn match listFileUnk '^\s*o [^\[\]:]*'
-syn match listFileDone '^\s*x [^\[\]:]*'
-syn match listFileDate '\[[^\]]\+\]$'
+syn match listFilePriOne '^\s*1 [^\[\]{}:]*'
+syn match listFilePriTwo '^\s*2 [^\[\]{}:]*'
+syn match listFilePriRest '^\s*[3-9] [^\[\]{}:]*'
+syn match listFileNonStart '^\s*- [^\[\]{}:]*'
+syn match listFileProg '^\s*= [^\[\]{}:]*'
+syn match listFileUnk '^\s*o [^\[\]{}:]*'
+syn match listFileDone '^\s*x [^\[\]{}:]*'
+syn match listFileDate '\[[^\]]\+\]'
+syn match listFileDate '{[^}]\+}'
 syn match listFileTag ':\S\+:'
 
 hi def listFileNonStart ctermfg=NONE cterm=bold
