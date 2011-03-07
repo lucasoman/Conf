@@ -1,31 +1,45 @@
 " Creates and maintains text files of nested lists.
 " File must end in '.list'.
-" Use >> and << to adjust depth of item.
 " Includes nested folding for lists. Use standard vim fold shortcuts (e.g.: zo, zc).
+"
 " Commands and shortcuts:
+"
 " CREATING
 " ,n - create new item
 " <enter> - (insert or normal) create new item
 " ,s - create sub item
 " <tab> - (insert or normal) create sub-item
 " ,u - create super item
+"
 " MARKING
+" :Lmark <mark> - (normal or visual line) mark item(s) with <mark>
 " ,p - mark item with '=' (in progress)
 " ,x - mark item with 'x' (completed)
 " ,o - mark item with 'o'
 " ,? - mark item with '?'
 " ,- - mark item with '-' (default, incomplete)
 " ,N - set priority as N, where N is 1-5
-" ET CETERA
-" ,t - add/update timestamp on item
-" ,r - (visual line) sort highlighted items
-" ,r - (normal) sort entire file
-" :Lcreate <name> - create new list file in current buffer with <name> (".list" is added automagically)
+"
+" TAGGING
+" :Ltag <tag> [tag ...] - (normal or visual line) add tag(s) to line(s) (has auto complete)
+" :Ltagr <tag> [tag ...] - (normal or visual line) remove tag(s) from line(s) (has auto complete)
+"
+" SETTING DUE DATES
+" :Ldue [date] - (normal or visual line) set due date. Today is the default.
+" :Lduer - (normal or visual line) remove due date
+"
+" SEARCHING
 " :Lsearch mark <mark> - find all items with <mark> (e.g.: =, 1, -, etc.) using location list
 "          tag <tag> - find all items with <tag> using location list
-" :Ltag <tag> [tag ...] - (normal or visual line) add tag(s) to line(s) (has tab complete)
-" :Ltagr <tag> [tag ...] - (normal or visual line) remove tag(s) from line(s) (has tab complete)
-" :Lmark <mark> - (normal or visual line) mark item(s) with <mark>
+"          due [date] - find all items due on [date]. Today is the default.
+"
+" SORTING
+" ,r - (visual line) sort highlighted items
+" ,r - (normal) sort entire file
+"
+" ET CETERA
+" :Lcreate <name> - create new list file in current buffer with <name> (".list" is added automagically)
+" ,t - add/update last-modified timestamp on item
 
 """
 """ CONFIGURABLE OPTIONS
@@ -42,6 +56,10 @@ endif
 " sort order for item marks
 if (!exists("g:listFile_ranks"))
 	let g:listFile_ranks = ['=','1','2','3','4','5','o','-','?','x']
+endif
+" default mark
+if (!exists("g:listFile_mark"))
+	let g:listFile_mark = '-'
 endif
 
 """
@@ -111,7 +129,7 @@ fun! ListFile() "{{{
 	nmap <buffer> ,4 :Lmark 4<CR>
 	nmap <buffer> ,5 :Lmark 5<CR>
 	" add/update [t]imestamp
-	nmap <buffer> ,t mz$a [<ESC>:call ListTimestamp()<CR><ESC>`z
+	nmap <buffer> ,t mz:call ListTimestamp()<CR>`z
 	vmap <buffer> ,r :call ListSortV()<CR>
 	nmap <buffer> ,r :call ListSortAll()<CR>
 
@@ -119,19 +137,27 @@ fun! ListFile() "{{{
 	com! -nargs=+ -buffer -range -complete=customlist,ListTagComplete Ltag :call ListTagV(<count>,"<args>")
 	com! -nargs=+ -buffer -range -complete=customlist,ListTagComplete Ltagr :call ListTagRV(<count>,"<args>")
 	com! -nargs=1 -buffer -range Lmark :call ListSetMark(<count>,"<args>")
+	com! -nargs=* -buffer -range Ldue :call ListSetDue(<count>,"<args>")
+	com! -nargs=0 -buffer -range Lduer :call ListRemoveDue(<count>)
 
 	let b:tags = {}
 	call ListTagCompileIndex()
 endfunction "}}}
-
+" create a new item
 fun! ListNewItem(indent) "{{{
 	" save current line for later
 	let startline = getline('.')
 	let startlinenum = line('.')
 
-	" get mark of current line to re-use
-	let matches = matchlist(l:startline,'^\s*\(\S\+\)')
-	let mark = l:matches[1]
+	" decide which mark to use
+	if (a:indent != 0)
+		" we're indenting, so just use the default
+		let mark = g:listFile_mark
+	else
+		" we're adding a new one at the same or higher level, so use the mark from above
+		let matches = matchlist(l:startline,'^\s*\(\S\+\)')
+		let mark = l:matches[1]
+	end
 
 	" should we advance to end of fold before creating item?
 	if (foldlevel(l:startlinenum) > foldlevel(l:startlinenum - 1) || ListGetDepth(l:startline) < ListGetDepth(getline(l:startlinenum - 1))) && a:indent == 0
@@ -146,14 +172,9 @@ fun! ListNewItem(indent) "{{{
 	endif
 
 	" show timestamp or not?
-	if (g:listFile_timestamp == 1)
-		let @z = l:mark."  [\n"
-		normal "zp
-		call ListTimestamp()
-	else
-		let @z = l:mark." \n"
-		normal "zp
-	endif
+	let @z = l:mark." \n"
+	normal "zp
+	call ListTimestampOptional()
 
 	" indent as needed, add initial indent
 	let i = a:indent + ListGetDepth(l:startline)
@@ -169,41 +190,44 @@ fun! ListNewItem(indent) "{{{
 	" go back to a convenient location in the line
 	normal ^l
 endfunction "}}}
-
+" search the list
 fun! ListSearch(args) "{{{
 	let args = split(a:args,' ')
 	let type = remove(l:args,0)
-	echo l:args
 	let string = join(l:args,' ')
 	if (l:type == 'mark')
 		call ListMark(l:string)
 	elseif (l:type == 'tag')
 		call ListTagSearch(l:string)
+	elseif (l:type == 'due')
+		call ListDueSearch(l:string)
 	endif
 endfunction "}}}
-
+" create a new list file
 fun! ListCreate(name) "{{{
 	exe 'e '.a:name.'.list'
-	let @z = '- '
+	let @z = g:listFile_mark.' '
 	normal "zP
 endfunction "}}}
-
-" fix properly formatted timestamp
-fun! ListTimestamp() "{{{
-	let addStamp = 0
-	if getline('.') =~ '\['
-		let addStamp = 1
-	endif
-	normal ^t[d$
-	if l:addStamp
-		call ListTimestampString()
-		normal "zp
+" add/update timestamp only if option enabled
+fun! ListTimestampOptional() "{{{
+	if (g:listFile_timestamp == 1)
+		ListTimestamp()
 	endif
 endfunction "}}}
-
+" fix properly formatted timestamp
+fun! ListTimestamp() "{{{
+	let line = getline('.')
+	if (match(l:line,'\[[^\]]*\]') >= 0)
+		let newline = substitute(l:line,'\[[^\]]*\]',ListTimestampString(),'')
+	else
+		let newline = l:line.' '.ListTimestampString()
+	end
+	call setline(line('.'),l:newline)
+endfunction "}}}
 " return actual timestamp string
 fun! ListTimestampString() "{{{
-	let @z = ' ['.strftime('%y-%m-%d %H:%M').']'
+	return '['.strftime('%y-%m-%d %H:%M').']'
 endfunction "}}}
 
 
@@ -226,7 +250,6 @@ fun! ListFoldLine() "{{{
 	endif
 	return l:foldLine
 endfunction "}}}
-
 " foldexpr function
 fun! ListFoldLevel(linenum) "{{{
 	let s:prefix = ''
@@ -263,12 +286,10 @@ endfunction "}}}
 fun! ListSortV() range "{{{
 	call ListSort(a:firstline,a:lastline)
 endfunction "}}}
-
 " sort whole file
 fun! ListSortAll() "{{{
 	call ListSort(1,line('$'))
 endfunction "}}}
-
 " sort range of lines
 fun! ListSort(start,end) "{{{
 	let s:sortLines = getline(a:start,a:end)
@@ -283,7 +304,6 @@ fun! ListSort(start,end) "{{{
 	let sorted = ListCompileSorted(0)
 	call setline(a:start,l:sorted)
 endfunction "}}}
-
 " construct sorted list string from sortDict
 fun! ListCompileSorted(index) "{{{
 	call ListConvertRanks()
@@ -303,7 +323,6 @@ fun! ListCompileSorted(index) "{{{
 		return []
 	endif
 endfunction "}}}
-
 " put entire list in dictionary format for sorting
 " this cannot be recursive, as any list file with lines > maxfuncdepth could be sorted
 fun! ListDictFormat() "{{{
@@ -330,14 +349,12 @@ fun! ListDictFormat() "{{{
 	let s:index = s:index + 1
 	return 1
 endfunction "}}}
-
 " sorting function
 fun! ListSortFunction(one,two) "{{{
 	let onerank = ListGetItemRank(a:one[1])
 	let tworank = ListGetItemRank(a:two[1])
 	return l:onerank == l:tworank ? 0 : l:onerank < l:tworank ? -1 : 1
 endfunction "}}}
-
 "converts ranks to usable dictionary
 fun! ListConvertRanks() "{{{
 	let i = 0
@@ -346,7 +363,6 @@ fun! ListConvertRanks() "{{{
 		let i = l:i + 1
 	endfor
 endfunction "}}}
-
 " get rank for the given line based on user-defined mark ranks
 fun! ListGetItemRank(line) "{{{
 	let matches = matchlist(a:line,'^\s*\(\S\+\)')
@@ -354,7 +370,6 @@ fun! ListGetItemRank(line) "{{{
 	let default = 1000 + char2nr(l:mark)
 	return get(s:ranks,l:mark,l:default)
 endfunction "}}}
-
 " get the depth of the given line
 fun! ListGetDepth(line) "{{{
 	return match(a:line,"[^\t]",0)
@@ -373,11 +388,10 @@ fun! ListSetMark(end,mark) "{{{
 	else
 		let @z = strpart(a:mark,0,1)
 		normal mz^dl"zP
-		call ListTimestamp()
+		call ListTimestampOptional()
 		normal `z
 	endif
 endfunction "}}}
-
 " find items with mark
 fun! ListMark(mark) "{{{
 	exe 'lvimgrep /^\s*'.a:mark.'/ %'
@@ -393,7 +407,13 @@ endfunction "}}}
 fun! ListTag(line,tags) "{{{
 	let line = getline(a:line)
 	let tags = ' :'.join(split(a:tags,' '),': :').':'
-	let pos = match(l:line,'\[')
+	let pos1 = match(l:line,'\[')
+	let pos2 = match(l:line,'{')
+	if (l:pos1 == -1 || l:pos2 == -1)
+		let pos = max([l:pos1,l:pos2])
+	else
+		let pos = min([l:pos1,l:pos2])
+	end
 	if (l:pos == -1)
 		let line = l:line.l:tags
 	else
@@ -404,7 +424,6 @@ fun! ListTag(line,tags) "{{{
 		let b:tags[tagString] = 'x'
 	endfor
 endfunction "}}}
-
 " remove tag from line
 fun! ListTagR(line,tags) "{{{
 	let line = getline(a:line)
@@ -414,7 +433,6 @@ fun! ListTagR(line,tags) "{{{
 	endfor
 	call setline(a:line,l:line)
 endfunction "}}}
-
 " tag lines in visual mode
 fun! ListTagV(end,tags) range "{{{
 	let start = line('.')
@@ -424,7 +442,6 @@ fun! ListTagV(end,tags) range "{{{
 		let start = l:start + 1
 	endwhile
 endfunction "}}}
-
 " remove tags in visual mode
 fun! ListTagRV(end,tags) range "{{{
 	let start = line('.')
@@ -434,13 +451,11 @@ fun! ListTagRV(end,tags) range "{{{
 		let start = l:start + 1
 	endwhile
 endfunction "}}}
-
 " search for tag
 fun! ListTagSearch(string) "{{{
 	exe 'lvimgrep /:'.a:string.':/ %'
 	lopen
 endfunction "}}}
-
 " compile tag index
 fun! ListTagCompileIndex() "{{{
 	for line in getbufline('%',0,'$')
@@ -455,7 +470,6 @@ fun! ListTagCompileIndex() "{{{
 		endif
 	endfor
 endfunction "}}}
-
 " autocomplete function for tags
 fun! ListTagComplete(argLead,cmdLine,cursorPos) "{{{
 	let matches = []
@@ -465,4 +479,67 @@ fun! ListTagComplete(argLead,cmdLine,cursorPos) "{{{
 		endif
 	endfor
 	return l:matches
+endfunction "}}}
+
+
+"""
+""" DUE DATES
+"""
+
+" find a due date
+fun! ListDueSearch(date) "{{{
+	let date = ListDateTranslate(a:date)
+	exe 'lvimgrep /{'.l:date.'}/ %'
+	lopen
+endfunction "}}}
+" set the due date for a range of lines
+fun! ListSetDue(end,date) "{{{
+	let date = ListDateTranslate(a:date)
+	let start = line('.')
+	let end = a:end > 0 ? a:end : line('.')
+	while (l:start <= l:end)
+		call ListDue(l:start,l:date)
+		let start = l:start + 1
+	endwhile
+endfunction "}}}
+" set the due date for a line
+fun! ListDue(linenum,date) "{{{
+	let line = getline(a:linenum)
+	if (match(l:line,'{.*}') >= 0)
+		let newline = substitute(l:line,'{.*}','{'.a:date.'}','')
+	else
+		let newline = l:line.' {'.a:date.'}'
+	end
+	call setline(a:linenum,l:newline)
+endfunction "}}}
+" remove due dates from range of lines
+fun! ListRemoveDue(end) "{{{
+	let start = line('.')
+	let end = a:end > 0 ? a:end : line('.')
+	while (l:start <= l:end)
+		call ListDueR(l:start)
+		let start = l:start + 1
+	endwhile
+endfunction "}}}
+" remove due date from a line
+fun! ListDueR(linenum) "{{{
+	let line = substitute(getline(a:linenum),'\s\={[^}]*}','','')
+	call setline(a:linenum,l:line)
+endfunction "}}}
+" translate a string into the appropriate date string
+fun! ListDateTranslate(date) "{{{
+	if (a:date == '' || a:date == "today")
+		let date = strftime('%y-%m-%d')
+	elseif (a:date == "tomorrow")
+		let date = strftime('%y-%m-%d',localtime() + 24*60*60)
+	elseif (match(a:date,'^\d* days\?$') >= 0)
+		let matches = matchlist(a:date,'^\(\d*\)')
+		let date = strftime('%y-%m-%d',localtime() + 24*60*60*l:matches[1])
+	elseif (match(a:date,'^\d* weeks\?$') >= 0)
+		let matches = matchlist(a:date,'^\(\d*\)')
+		let date = strftime('%y-%m-%d',localtime() + 24*60*60*7*l:matches[1])
+	else
+		let date = a:date
+	end
+	return l:date
 endfunction "}}}
