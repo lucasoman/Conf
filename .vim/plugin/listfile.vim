@@ -25,8 +25,8 @@
 " :Ltagr <tag> [tag ...] - (normal or visual line) remove tag(s) from line(s) (has auto complete)
 "
 " SETTING DUE DATES
-" :Ldue [date] - set due date. Today is the default.
-" :Lduer - remove due date
+" :Ldue [date] - (normal or visual line) set due date. Today is the default.
+" :Lduer - (normal or visual line) remove due date
 "
 " SEARCHING
 " :Lsearch mark <mark> - find all items with <mark> (e.g.: =, 1, -, etc.) using location list
