@@ -104,7 +104,8 @@ set visualbell
 "not a big fan of this; will keep just in case
 "set listchars=tab:\|\ 
 "set listchars=tab:\|Â,trail:Â
-"set list
+set listchars=tab:\|\ ,trail:.
+set list
 
 " complete to longest match, then list possibilities
 set wildmode=longest,list
@@ -288,12 +289,12 @@ fun! ToggleColumns() "{{{
     set foldcolumn=0
     let s:showbreaktmp = &showbreak
     set showbreak=
-		"set nolist
+		set nolist
   else
     set number
     set foldcolumn=2
     let &showbreak = s:showbreaktmp
-		"set list
+		set list
   end
 endfunction
 "}}}
