@@ -24,6 +24,10 @@
 " :Ltag <tag> [tag ...] - (normal or visual line) add tag(s) to line(s) (has auto complete)
 " :Ltagr <tag> [tag ...] - (normal or visual line) remove tag(s) from line(s) (has auto complete)
 "
+" SETTING DUE DATES
+" :Ldue [date] - set due date. Today is the default.
+" :Lduer - remove due date
+"
 " SEARCHING
 " :Lsearch mark <mark> - find all items with <mark> (e.g.: =, 1, -, etc.) using location list
 "          tag <tag> - find all items with <tag> using location list
@@ -36,7 +40,6 @@
 " ET CETERA
 " :Lcreate <name> - create new list file in current buffer with <name> (".list" is added automagically)
 " ,t - add/update last-modified timestamp on item
-" :Ldue [date] - set due date. Today is the default.
 
 """
 """ CONFIGURABLE OPTIONS
@@ -53,6 +56,10 @@ endif
 " sort order for item marks
 if (!exists("g:listFile_ranks"))
 	let g:listFile_ranks = ['=','1','2','3','4','5','o','-','?','x']
+endif
+" default mark
+if (!exists("g:listFile_mark"))
+	let g:listFile_mark = '-'
 endif
 
 """
@@ -131,6 +138,7 @@ fun! ListFile() "{{{
 	com! -nargs=+ -buffer -range -complete=customlist,ListTagComplete Ltagr :call ListTagRV(<count>,"<args>")
 	com! -nargs=1 -buffer -range Lmark :call ListSetMark(<count>,"<args>")
 	com! -nargs=* -buffer -range Ldue :call ListSetDue(<count>,"<args>")
+	com! -nargs=0 -buffer -range Lduer :call ListRemoveDue(<count>)
 
 	let b:tags = {}
 	call ListTagCompileIndex()
@@ -141,9 +149,15 @@ fun! ListNewItem(indent) "{{{
 	let startline = getline('.')
 	let startlinenum = line('.')
 
-	" get mark of current line to re-use
-	let matches = matchlist(l:startline,'^\s*\(\S\+\)')
-	let mark = l:matches[1]
+	" decide which mark to use
+	if (a:indent != 0)
+		" we're indenting, so just use the default
+		let mark = g:listFile_mark
+	else
+		" we're adding a new one at the same or higher level, so use the mark from above
+		let matches = matchlist(l:startline,'^\s*\(\S\+\)')
+		let mark = l:matches[1]
+	end
 
 	" should we advance to end of fold before creating item?
 	if (foldlevel(l:startlinenum) > foldlevel(l:startlinenum - 1) || ListGetDepth(l:startline) < ListGetDepth(getline(l:startlinenum - 1))) && a:indent == 0
@@ -160,9 +174,7 @@ fun! ListNewItem(indent) "{{{
 	" show timestamp or not?
 	let @z = l:mark." \n"
 	normal "zp
-	if (g:listFile_timestamp == 1)
-		call ListTimestamp()
-	endif
+	call ListTimestampOptional()
 
 	" indent as needed, add initial indent
 	let i = a:indent + ListGetDepth(l:startline)
@@ -194,8 +206,14 @@ endfunction "}}}
 " create a new list file
 fun! ListCreate(name) "{{{
 	exe 'e '.a:name.'.list'
-	let @z = '- '
+	let @z = g:listFile_mark.' '
 	normal "zP
+endfunction "}}}
+" add/update timestamp only if option enabled
+fun! ListTimestampOptional() "{{{
+	if (g:listFile_timestamp == 1)
+		ListTimestamp()
+	endif
 endfunction "}}}
 " fix properly formatted timestamp
 fun! ListTimestamp() "{{{
@@ -370,7 +388,7 @@ fun! ListSetMark(end,mark) "{{{
 	else
 		let @z = strpart(a:mark,0,1)
 		normal mz^dl"zP
-		call ListTimestamp()
+		call ListTimestampOptional()
 		normal `z
 	endif
 endfunction "}}}
@@ -493,6 +511,20 @@ fun! ListDue(linenum,date) "{{{
 		let newline = l:line.' {'.a:date.'}'
 	end
 	call setline(a:linenum,l:newline)
+endfunction "}}}
+" remove due dates from range of lines
+fun! ListRemoveDue(end) "{{{
+	let start = line('.')
+	let end = a:end > 0 ? a:end : line('.')
+	while (l:start <= l:end)
+		call ListDueR(l:start)
+		let start = l:start + 1
+	endwhile
+endfunction "}}}
+" remove due date from a line
+fun! ListDueR(linenum) "{{{
+	let line = substitute(getline(a:linenum),'\s\={[^}]*}','','')
+	call setline(a:linenum,l:line)
 endfunction "}}}
 " translate a string into the appropriate date string
 fun! ListDateTranslate(date) "{{{
