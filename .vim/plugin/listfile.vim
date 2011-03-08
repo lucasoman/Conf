@@ -532,6 +532,8 @@ fun! ListDateTranslate(date) "{{{
 		let date = strftime('%y-%m-%d')
 	elseif (a:date == "tomorrow")
 		let date = strftime('%y-%m-%d',localtime() + 24*60*60)
+	elseif (a:date == "yesterday")
+		let date = strftime('%y-%m-%d',localtime() - 24*60*60)
 	elseif (match(a:date,'^\d* days\?$') >= 0)
 		let matches = matchlist(a:date,'^\(\d*\)')
 		let date = strftime('%y-%m-%d',localtime() + 24*60*60*l:matches[1])
