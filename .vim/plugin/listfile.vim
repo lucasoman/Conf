@@ -24,14 +24,23 @@
 " :Ltag <tag> [tag ...] - (normal or visual line) add tag(s) to line(s) (has auto complete)
 " :Ltagr <tag> [tag ...] - (normal or visual line) remove tag(s) from line(s) (has auto complete)
 "
-" SETTING DUE DATES
-" :Ldue [date] - (normal or visual line) set due date. Today is the default.
-" :Lduer - (normal or visual line) remove due date
-"
 " SEARCHING
 " :Lsearch mark <mark> - find all items with <mark> (e.g.: =, 1, -, etc.) using location list
 "          tag <tag> - find all items with <tag> using location list
 "          due [date] - find all items due on [date]. Today is the default.
+"
+" SETTING DUE DATES
+" :Ldue [date] - (normal or visual line) set due date. Today is the default.
+" :Lduer - (normal or visual line) remove due date
+" Due dates are in the format YY-MM-DD or any of: yesterday, today, tomorrow,
+"                                                 N day[s], N week[s] (where N is a positive number)
+"                                                 N-M day[s], N-M week[s] (where N and M are postive numbers and N <= M)
+" E.g.: To see all items due the remainder of this week or next week: :Lsearch due 0-1 week
+"       To see all items due next week: :Lsearch due 1-1 week
+"       To see all items due tomorrow or the next day: :Lsearch due 1-2 day
+"       To make an item due end of next week: :Ldue 1-1 week
+"       To make an item due one week from today: :Ldue 1 week
+"       To see all items due in exactly four days: :Lsearch due 4 days
 "
 " SORTING
 " ,r - (visual line) sort highlighted items
@@ -488,13 +497,15 @@ endfunction "}}}
 
 " find a due date
 fun! ListDueSearch(date) "{{{
-	let date = ListDateTranslate(a:date)
-	exe 'lvimgrep /{'.l:date.'}/ %'
+	let dates = ListDateTranslate(a:date)
+	let datestring = join(l:dates,'\|')
+	exe 'lvimgrep /{\('.l:datestring.'\)}/ %'
 	lopen
 endfunction "}}}
 " set the due date for a range of lines
 fun! ListSetDue(end,date) "{{{
-	let date = ListDateTranslate(a:date)
+	let dates = ListDateTranslate(a:date)
+	let date = l:dates[len(l:dates)-1]
 	let start = line('.')
 	let end = a:end > 0 ? a:end : line('.')
 	while (l:start <= l:end)
@@ -526,20 +537,58 @@ fun! ListDueR(linenum) "{{{
 	let line = substitute(getline(a:linenum),'\s\={[^}]*}','','')
 	call setline(a:linenum,l:line)
 endfunction "}}}
-" translate a string into the appropriate date string
+" translate a string into the appropriate array of date strings
 fun! ListDateTranslate(date) "{{{
+	let dateFormat = '%y-%m-%d'
+	let dates = []
 	if (a:date == '' || a:date == "today")
-		let date = strftime('%y-%m-%d')
+		let dates = add(l:dates,strftime(l:dateFormat))
 	elseif (a:date == "tomorrow")
-		let date = strftime('%y-%m-%d',localtime() + 24*60*60)
-	elseif (match(a:date,'^\d* days\?$') >= 0)
-		let matches = matchlist(a:date,'^\(\d*\)')
-		let date = strftime('%y-%m-%d',localtime() + 24*60*60*l:matches[1])
-	elseif (match(a:date,'^\d* weeks\?$') >= 0)
-		let matches = matchlist(a:date,'^\(\d*\)')
-		let date = strftime('%y-%m-%d',localtime() + 24*60*60*7*l:matches[1])
+		let dates = add(l:dates,strftime(l:dateFormat,localtime() + 24*60*60))
+	elseif (a:date == "yesterday")
+		let dates = add(l:dates,strftime(l:dateFormat,localtime() - 24*60*60))
+	elseif (match(a:date,'^[0-9-]\+ days\?$') >= 0)
+		let matches = matchlist(a:date,'^\(\d\+\)\(-\(\d\+\)\)\?')
+		if (get(l:matches,3) != '')
+			" we're calculating a range of days
+			let rangeStart = l:matches[1]
+			while (rangeStart <= l:matches[3])
+				let dates = add(l:dates,strftime(l:dateFormat,localtime() + 24*60*60*l:rangeStart))
+				let rangeStart = l:rangeStart + 1
+			endwhile
+		else
+			let dates = add(l:dates,strftime(l:dateFormat,localtime() + 24*60*60*l:matches[1]))
+		endif
+	elseif (match(a:date,'^[0-9-]\+ weeks\?$') >= 0)
+		let matches = matchlist(a:date,'^\(\d\+\)\(-\(\d\+\)\)\?')
+		if (get(l:matches,3) != '')
+			" we're calculating a range of weeks
+			let currentWeek = l:matches[1]
+			let endWeek = l:matches[3]
+			if (l:currentWeek > 0)
+				" since we're not including this week, we need to jump to the correct
+				" day in the future and the correct day of the week (monday)
+				let currentDay = 1
+				let totalDays = (7 - strftime('%u') + 1) + 7 * (l:currentWeek - 1)
+			else
+				" since we're including this week, we need to start today
+				let currentDay = strftime('%u')
+				let totalDays = 0
+			end
+			while (l:currentWeek <= l:endWeek)
+				while (l:currentDay <= 7)
+					let dates = add(l:dates,strftime(l:dateFormat,localtime() + 24*60*60*l:totalDays))
+					let currentDay = l:currentDay + 1
+					let totalDays = l:totalDays + 1
+				endwhile
+				let currentDay = 1
+				let currentWeek = l:currentWeek + 1
+			endwhile
+		else
+			let dates = add(l:dates,strftime(l:dateFormat,localtime() + 24*60*60*7*l:matches[1]))
+		endif
 	else
-		let date = a:date
-	end
-	return l:date
+		let dates = add(l:dates,a:date)
+	endif
+	return l:dates
 endfunction "}}}
