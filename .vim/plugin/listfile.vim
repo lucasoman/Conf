@@ -566,13 +566,13 @@ fun! ListDateTranslate(date) "{{{
 			" we're calculating a range of weeks
 			let currentWeek = l:matches[1]
 			let endWeek = l:matches[3]
-			let currentDay = 1
+			let currentDay = 1 " weeks start on monday
 			if (l:currentWeek > 0)
 				" since we're not including this week, we need to jump to the correct
 				" day in the future and the correct day of the week (monday)
 				let totalDays = (7 - strftime('%u') + 1) + 7 * (l:currentWeek - 1)
 			else
-				" since we're including this week, we need to start today
+				" we need to count the correct number of days back
 				let totalDays = strftime('%u') * -1 + 2 + 7 * l:currentWeek
 			end
 			while (l:currentWeek <= l:endWeek)
