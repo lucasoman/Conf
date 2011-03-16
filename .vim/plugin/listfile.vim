@@ -33,12 +33,13 @@
 " :Ldue [date] - (normal or visual line) set due date. Today is the default.
 " :Lduer - (normal or visual line) remove due date
 " Due dates are in the format YY-MM-DD or any of: yesterday, today, tomorrow,
-"                                                 N day[s], N week[s] (where N is a positive number)
-"                                                 N-M day[s], N-M week[s] (where N and M are postive numbers and N <= M)
-" E.g.: To see all items due the remainder of this week or next week: :Lsearch due 0-1 week
-"       To see all items due next week: :Lsearch due 1-1 week
-"       To see all items due tomorrow or the next day: :Lsearch due 1-2 day
-"       To make an item due end of next week: :Ldue 1-1 week
+"                                                 N day[s], N week[s] (where N is a number)
+"                                                 N:M day[s], N:M week[s] (where N and M are numbers and N <= M)
+" E.g.: To see all items due this week or next week: :Lsearch due 0:1 week
+"       To see all items due next week: :Lsearch due 1:1 week
+"       To see all items due last, this, or next weeks: :Lsearch due -1:1 week
+"       To see all items due tomorrow or the next day: :Lsearch due 1:2 day
+"       To make an item due end of next week: :Ldue 1:1 week
 "       To make an item due one week from today: :Ldue 1 week
 "       To see all items due in exactly four days: :Lsearch due 4 days
 "
@@ -547,8 +548,8 @@ fun! ListDateTranslate(date) "{{{
 		let dates = add(l:dates,strftime(l:dateFormat,localtime() + 24*60*60))
 	elseif (a:date == "yesterday")
 		let dates = add(l:dates,strftime(l:dateFormat,localtime() - 24*60*60))
-	elseif (match(a:date,'^[0-9-]\+ days\?$') >= 0)
-		let matches = matchlist(a:date,'^\(\d\+\)\(-\(\d\+\)\)\?')
+	elseif (match(a:date,'^[0-9:-]\+ days\?$') >= 0)
+		let matches = matchlist(a:date,'^\(-\?\d\+\)\(:\(-\?\d\+\)\)\?')
 		if (get(l:matches,3) != '')
 			" we're calculating a range of days
 			let rangeStart = l:matches[1]
@@ -559,21 +560,20 @@ fun! ListDateTranslate(date) "{{{
 		else
 			let dates = add(l:dates,strftime(l:dateFormat,localtime() + 24*60*60*l:matches[1]))
 		endif
-	elseif (match(a:date,'^[0-9-]\+ weeks\?$') >= 0)
-		let matches = matchlist(a:date,'^\(\d\+\)\(-\(\d\+\)\)\?')
+	elseif (match(a:date,'^[0-9:-]\+ weeks\?$') >= 0)
+		let matches = matchlist(a:date,'^\(-\?\d\+\)\(:\(-\?\d\+\)\)\?')
 		if (get(l:matches,3) != '')
 			" we're calculating a range of weeks
 			let currentWeek = l:matches[1]
 			let endWeek = l:matches[3]
+			let currentDay = 1
 			if (l:currentWeek > 0)
 				" since we're not including this week, we need to jump to the correct
 				" day in the future and the correct day of the week (monday)
-				let currentDay = 1
 				let totalDays = (7 - strftime('%u') + 1) + 7 * (l:currentWeek - 1)
 			else
 				" since we're including this week, we need to start today
-				let currentDay = strftime('%u')
-				let totalDays = 0
+				let totalDays = strftime('%u') * -1 + 2 + 7 * l:currentWeek
 			end
 			while (l:currentWeek <= l:endWeek)
 				while (l:currentDay <= 7)
