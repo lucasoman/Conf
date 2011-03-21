@@ -500,7 +500,7 @@ endfunction "}}}
 fun! ListDueSearch(date) "{{{
 	let dates = ListDateTranslate(a:date)
 	let datestring = join(l:dates,'\|')
-	exe 'lvimgrep /{\('.l:datestring.'\)}/ %'
+		exe 'lvimgrep /^\s*[^x	 ]\+.*{\('.l:datestring.'\)}/ %'
 	lopen
 endfunction "}}}
 " set the due date for a range of lines
