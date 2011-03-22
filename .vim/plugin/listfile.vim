@@ -80,6 +80,7 @@ com! -nargs=1 Lcreate :call ListCreate("<args>")
 
 let s:ranks = {}
 autocmd BufNewFile,BufRead *.list call ListFile()
+autocmd BufReadPost quickfix call ListFixLocationWin()
 
 " 'install' list features
 fun! ListFile() "{{{
@@ -238,6 +239,15 @@ endfunction "}}}
 " return actual timestamp string
 fun! ListTimestampString() "{{{
 	return '['.strftime('%y-%m-%d %H:%M').']'
+endfunction "}}}
+" set the format of the location window contents
+fun! ListFixLocationWin() "{{{
+	let firstLine = getline(1)
+	if (match(l:firstLine,'\.list|') >= 0)
+		set modifiable
+		silent exe 'g/^[^|]\+|[^|]\+|\s*/s///g'
+		setlocal nomodifiable
+	endif
 endfunction "}}}
 
 
