@@ -113,6 +113,12 @@ set wildmode=longest,list
 " turn off swap files
 set noswapfile
 
+" options for diff mode
+set diffopt=filler
+set diffopt+=context:4
+set diffopt+=iwhite
+set diffopt+=vertical
+
 " }}}
 " {{{ colors
 " tabe line colors

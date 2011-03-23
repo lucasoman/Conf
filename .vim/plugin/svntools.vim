@@ -19,6 +19,7 @@
 com! -nargs=? Sdiff :call SvnDiff("<args>",bufname('%'))
 com! -nargs=? Slog :call SvnLog("<args>",bufname('%'))
 com! -nargs=? Sinfo :call SvnInfo("<args>",bufname('%'))
+com! -nargs=0 -range Scdiff :call SvnConflictDiff(<count>)
 com! Sblame :call SvnBlame(bufname('%'))
 com! -nargs=? Sdiffs :call SvnDiffSplit(expand('%:h'),expand('%:t'),"<args>")
 com! -nargs=? Srev :call SvnModeDiff("<args>")
@@ -49,6 +50,32 @@ fun! SvnDiff(args,file)
 	endif
 	exe "r !svn diff -x -w ".l:options.l:file
 	setlocal filetype=diff
+endfunction
+fun! SvnConflictDiff(end)
+	let working = []
+	let merge = []
+	let start = line('.')
+	while (l:start <= a:end)
+		let currentLine = getline(l:start)
+		if (match(l:currentLine,'^<<<<<<<') >= 0)
+			let blockStart = l:start + 1
+		elseif (match(l:currentLine,'^=======') >= 0)
+			call extend(working,getline(l:blockStart,l:start - 1))
+			let blockStart = l:start + 1
+		elseif (match(l:currentLine,'^>>>>>>>') >= 0)
+			call extend(merge,getline(l:blockStart,l:start - 1))
+		endif
+		let start = l:start + 1
+	endwhile
+	tabe
+	set bt=nofile
+	vert new
+	set bt=nofile
+	call setline(1,l:working)
+	diffthis
+	wincmd p
+	call setline(1,l:merge)
+	diffthis
 endfunction
 fun! SvnLog(args,file)
 	if a:args == ''
