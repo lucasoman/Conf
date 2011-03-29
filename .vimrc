@@ -284,6 +284,7 @@ fun! MyListFileStuff()
 	nmap <buffer> ,tq :Ltag quick<CR>
 	vmap <buffer> ,tq :Ltag quick<CR>
 	nmap <buffer> ,sq :Lsearch tag quick<CR>
+	nmap <buffer> ,d ,x,t,r
 endfunction
 "}}}
 
