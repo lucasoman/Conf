@@ -25,6 +25,7 @@ com! -nargs=? Sdiffs :call SvnDiffSplit(expand('%:h'),expand('%:t'),"<args>")
 com! -nargs=? Srev :call SvnModeDiff("<args>")
 com! -nargs=? Swin :call SvnModeWindow("<args>")
 com! -nargs=? Scl :call SvnChangeList("<args>",bufname('%'))
+com! -nargs=0 Sclr :exe "!svn cl --remove ".bufname('%')
 " view diff for file at revision under cursor
 nmap <Leader>sr :call SvnModeDiff(expand('<cword>'))<CR>gg
 nmap <Leader>sf :call SvnModeExport()<CR>gg
