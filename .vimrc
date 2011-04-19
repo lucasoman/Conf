@@ -212,7 +212,7 @@ nmap <Leader>fx :setlocal filetype=xml<CR>:%s/></>\r</g<CR>:1,$!xmllint --format
 vmap <Leader>cc :s!^!//!<CR>
 vmap <Leader>cu :s!^//!!<CR>
 " open local projects list file
-nmap <Leader>l :60vsplit ~/projects.list<CR>
+nmap <Leader>l :60vsplit ~/Dropbox/projects.list<CR>
 " fix syntax highlighting
 nmap <Leader>ss :syntax sync fromstart<CR>
 " open local journal file
