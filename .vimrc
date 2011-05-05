@@ -179,15 +179,19 @@ let g:netrw_sort_sequence = '[\/]$,\.php,\.phtml,*,\.info$,\.swp$,\.bak$,\~$'
 "}}}
 "{{{taglist options
 " set the names of flags
-let tlist_php_settings = 'php;c:class;f:function;d:constant'
+let tlist_php_settings = 'php;c:class;f:function;d:constant;p:property'
 " close all folds except for current file
 let Tlist_File_Fold_Auto_Close = 1
 " make tlist pane active when opened
 let Tlist_GainFocus_On_ToggleOpen = 1
 " width of window
-let Tlist_WinWidth = 40
+let Tlist_WinWidth = 60
 " close tlist when a selection is made
 let Tlist_Close_On_Select = 1
+" show the prototype
+let Tlist_Display_Prototype = 1
+" show tags only for current buffer
+let Tlist_Show_One_File = 1
 "}}}
 "{{{html options
 let html_use_css = 1
@@ -234,8 +238,8 @@ nmap <Leader>ph :!php --rf <cword><CR>
 " create test method
 nmap <Leader>pt o<CR>/**<CR>@test<CR>/<CR>public function<TAB>
 " phpdoc comments
-nmap <Leader>cc o/**<CR>$Rev$<CR>$Date$<CR>$Id$<CR>$Author$<CR>$HeadURL$<CR><CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR>@package <CR><BS>/<ESC>kkkk$a 
-nmap <Leader>cb o/**<CR><CR><CR>@author Lucas Oman <lucas.oman@bookit.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
+nmap <Leader>cc o/**<CR>$Rev$<CR>$Date$<CR>$Id$<CR>$Author$<CR>$HeadURL$<CR><CR><CR><CR>@package <CR><BS>/<ESC>kkk$a 
+nmap <Leader>cb o/**<CR><CR><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkk$a 
 nmap <Leader>cv o/**<CR><CR><CR>@var <CR><BS>/<ESC>kkk$a 
 nmap <Leader>cp o/**<CR><CR><CR>@author Lucas Oman <me@lucasoman.com><CR>@param <CR>@return <CR>@example <CR><BS>/<ESC>kkkkkk$a 
 "}}}
