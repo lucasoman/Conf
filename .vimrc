@@ -215,8 +215,6 @@ vmap <Leader>cu :s!^//!!<CR>
 nmap <Leader>l :60vsplit ~/Dropbox/projects.list<CR>
 " fix syntax highlighting
 nmap <Leader>ss :syntax sync fromstart<CR>
-" open local journal file
-nmap <Leader>j :60vsplit ~/journal.log<CR>G
 " toggle the tag list
 nmap <Leader>tl :TlistToggle<CR>
 " make arrow keys useful
@@ -258,7 +256,7 @@ endfunction
 fun! SvnPushFile()
 	let line = getline('.')
 	let file = strpart(l:line,8)
-	exe "!updatedev.php ".l:file
+	exe "!~/lib/updatedev.php ".l:file
 endfunction
 "}}}
 "f keys {{{
