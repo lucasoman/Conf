@@ -16,6 +16,8 @@
 " Known issues:
 " - If an SVNMode window is the only open tab, executing any SVNMode command closes vim
 " - Using \sf in an SVNMode window for a file breaks; only works in a SVNMode window for a dir
+let g:svn_diff_opt = "-w"
+"let g:svn_diff_opt = "--ignore-eol-style"
 com! -nargs=? Sdiff :call SvnDiff("<args>",bufname('%'))
 com! -nargs=? Slog :call SvnLog("<args>",bufname('%'))
 com! -nargs=? Sinfo :call SvnInfo("<args>",bufname('%'))
@@ -49,7 +51,7 @@ fun! SvnDiff(args,file)
 	else
 		let options = ''
 	endif
-	exe "r !svn diff -x -w ".l:options.l:file
+	exe "r !svn diff -x ".g:svn_diff_opt." ".l:options.l:file
 	setlocal filetype=diff
 endfunction
 fun! SvnConflictDiff(end)
@@ -161,7 +163,7 @@ fun! SvnModeDiff(rev)
 			exe "r !svn log -v -r ".l:num." ".l:file
 			let option = '-c'
 		endif
-		exe "r !svn diff -x -w ".l:option." ".l:num." ".l:file
+		exe "r !svn diff -x ".g:svn_diff_opt." ".l:option." ".l:num." ".l:file
 		setl filetype=diff
 	else
 		call SvnModeError()
