@@ -506,7 +506,7 @@ fun! DbSendQuery(query)
 	let db_user = g:db_credentials[b:which]['user']
 	let db_pass = g:db_credentials[b:which]['pass']
 	let db_host = g:db_credentials[b:which]['host']
-	let query = escape(shellescape('use '.g:db_credentials[b:which]['db'].'; '.a:query),'%')
+	let query = escape(shellescape('use '.g:db_credentials[b:which]['db'].'; '.a:query),'%!')
 	"let @z = "Query:\n".a:query."\n\nResult:"
 	let @z = "Result:"
 	normal "zPG
