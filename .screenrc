@@ -11,3 +11,10 @@ caption always "%{= KB} %n %t | %H %="
 
 bind j focus down
 bind k focus up
+
+screen -t vim
+split -v
+resize +50
+focus down
+screen
+focus down
