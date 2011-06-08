@@ -119,6 +119,13 @@ set diffopt+=context:4
 set diffopt+=iwhite
 set diffopt+=vertical
 
+" keep a lot of history
+set history=100
+
+" keep lots of stuff
+set viminfo+=:100
+set viminfo+=/100
+
 " }}}
 " {{{ colors
 " tabe line colors
