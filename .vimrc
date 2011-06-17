@@ -126,6 +126,9 @@ set history=100
 set viminfo+=:100
 set viminfo+=/100
 
+" don't duplicate an existing open buffer
+set switchbuf=useopen
+
 " }}}
 " {{{ colors
 " tabe line colors
@@ -384,12 +387,12 @@ imap <Tab> <C-R>=CleverTab()<CR>
 "CODE GREP {{{
 " grep for given string (second is case insensitive)
 " simply a wrapper for vimgrep
-" eg: :F /badxmlexception/ *.php lib
+" eg: :F /badxmlexception/ lib php
 com! -nargs=+ F :call CommandFind("<args>")
 fun! CommandFind(args)
 	tabe
 	let parts = split(a:args,' ')
-	exe "vimgrep ".l:parts[0]." ".l:parts[1]." ".l:parts[2]."/**/*"
+	exe "vimgrep ".l:parts[0]." ".l:parts[1]."/**/*.".l:parts[2]
 	exe "copen"
 endfunction
 "}}}
@@ -505,19 +508,21 @@ fun! DbExecuteQuery(query)
 	let b:which = l:which
 	normal R
 	setl buftype=nofile
+	setl nowrap
 	setfiletype mysqlresult
 	call DbSendQuery(a:query)
 endfunction
 " execute query
 fun! DbSendQuery(query)
+	let escapeChars = '%!#'
 	let db_user = g:db_credentials[b:which]['user']
 	let db_pass = g:db_credentials[b:which]['pass']
 	let db_host = g:db_credentials[b:which]['host']
-	let query = escape(shellescape('use '.g:db_credentials[b:which]['db'].'; '.a:query),'%!')
+	let query = escape(shellescape('use '.g:db_credentials[b:which]['db'].'; '.a:query),l:escapeChars)
 	"let @z = "Query:\n".a:query."\n\nResult:"
 	let @z = "Result:"
 	normal "zPG
-	exe "r !mysql -u ".db_user." -h ".db_host." --password=".db_pass." -t -v -v -v -e ".l:query
+	exe "r !mysql -u ".db_user." -h ".db_host." --password=".escape(db_pass,l:escapeChars)." -t -v -v -v -e ".l:query
 	normal gg
 endfunction
 "}}}
