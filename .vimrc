@@ -477,6 +477,7 @@ fun! DbOpen(which)
 		let which = a:which
 	end
 	exe "tabe DB-".l:which
+	call DbInstall()
 	let b:which = l:which
 	setl filetype=mysql
 	setl buftype=nofile
@@ -504,6 +505,7 @@ fun! DbExecuteQuery(query)
 	let g:db_window_count = g:db_window_count + 1
 	let which = b:which
 	exe 'new DB-'.g:db_window_count
+	call DbInstall()
 	nmap <buffer> <CR> :call DbExecuteQ()<CR>
 	let b:which = l:which
 	normal R
@@ -524,5 +526,9 @@ fun! DbSendQuery(query)
 	normal "zPG
 	exe "r !mysql -u ".db_user." -h ".db_host." --password=".escape(db_pass,l:escapeChars)." -t -v -v -v -e ".l:query
 	normal gg
+endfunction
+" 'install' shortcuts for mysql windows
+fun! DbInstall()
+	nmap <buffer> <leader>md :call DbExecuteQuery('desc '.expand('<cword>'))<CR>
 endfunction
 "}}}
