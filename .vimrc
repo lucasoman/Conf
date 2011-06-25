@@ -137,11 +137,11 @@ highlight TabLine ctermfg=4 ctermbg=DarkGray cterm=bold
 highlight TabLineSel ctermfg=7 cterm=none ctermbg=DarkGray
 
 " number column colors
-highlight LineNr cterm=none ctermbg=Black ctermfg=4
+highlight LineNr cterm=none ctermbg=none ctermfg=4
 
 " fold colors
-highlight Folded cterm=none ctermbg=Black ctermfg=4
-highlight FoldColumn cterm=none ctermbg=Black ctermfg=4
+highlight Folded cterm=none ctermbg=none ctermfg=4
+highlight FoldColumn cterm=none ctermbg=none ctermfg=4
 
 " visual mode colors
 highlight Visual ctermbg=7 ctermfg=4
