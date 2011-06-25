@@ -1,3 +1,4 @@
+" vim: fdm=marker
 " Creates and maintains text files of nested lists.
 " File must end in '.list'.
 " Includes nested folding for lists. Use standard vim fold shortcuts (e.g.: zo, zc).
@@ -88,7 +89,7 @@ fun! ListFile() "{{{
 
 	" we want our own folding stuff
 	setl foldmethod=expr
-	setl foldexpr=ListFoldLevel(v:lnum)
+	setl foldmethod=indent
 	setl foldtext=ListFoldLine()
 	
 	" set the configured tabbing options
@@ -159,6 +160,7 @@ fun! ListNewItem(indent) "{{{
 	" save current line for later
 	let startline = getline('.')
 	let startlinenum = line('.')
+	let lastlinenum = l:startlinenum
 
 	" decide which mark to use
 	if (a:indent != 0)
@@ -171,13 +173,14 @@ fun! ListNewItem(indent) "{{{
 	end
 
 	" should we advance to end of fold before creating item?
-	if (foldlevel(l:startlinenum) > foldlevel(l:startlinenum - 1) || ListGetDepth(l:startline) < ListGetDepth(getline(l:startlinenum - 1))) && a:indent == 0
+	if (foldlevel(l:startlinenum+1) > foldlevel(l:startlinenum) || ListGetDepth(getline(l:startlinenum+1)) < ListGetDepth(l:startline)) && a:indent == 0
 		normal j
-		while ListGetDepth(getline('.')) > ListGetDepth(l:startline) && line('.') < line('$')
+		while ListGetDepth(getline('.')) > ListGetDepth(l:startline) && line('.') != l:lastlinenum
+			let lastlinenum = line('.')
 			normal j
 		endwhile
 		" we've gone too far UNLESS we've hit the end of the file or we've hit the end, but only by coincidence
-		if line('.') != line('$') || (line('.') == line('$') && ListGetDepth(getline('.')) == ListGetDepth(l:startline) && line('.') != l:startlinenum)
+		if line('.') != l:lastlinenum || (line('.') == l:lastlinenum && ListGetDepth(getline('.')) == ListGetDepth(l:startline) && line('.') != l:startlinenum)
 			normal k
 		endif
 	endif
@@ -263,38 +266,13 @@ fun! ListFoldLine() "{{{
 		let s:spaces = s:spaces.' '
 		let s:count = s:count + 1
 	endwhile
-	let numLines = v:foldend - v:foldstart
-	let foldLine = substitute(getline(v:foldstart)." (".l:numLines.")","\t",s:spaces,'g')
+	let numLines = v:foldend - v:foldstart + 1
+	let tabs = matchstr(getline(v:foldstart),"^\t*")
+	let foldLine = repeat(s:spaces,strlen(l:tabs))."[".l:numLines." sub-items]"
 	if (winwidth(0) > strlen(foldLine))
 		let foldLine = l:foldLine.repeat(' ',winwidth(0) - strlen(foldLine))
 	endif
 	return l:foldLine
-endfunction "}}}
-" foldexpr function
-fun! ListFoldLevel(linenum) "{{{
-	let s:prefix = ''
-	let s:myline = getline(a:linenum)
-	let s:nextline = getline(a:linenum+1)
-	let s:mynumtabs = ListGetDepth(s:myline)
-	let s:nextnumtabs = ListGetDepth(s:nextline)
-	if s:nextnumtabs > s:mynumtabs " if this item has sub-items
-		let s:level = s:nextnumtabs
-	else " next item is either same or higher level
-		let s:level = s:mynumtabs
-		if s:nextnumtabs < s:mynumtabs " if next item has higher level, close this fold
-			let s:prefix = '<'
-			let s:level = s:nextnumtabs+1
-		end
-	endif
-	if a:linenum > 1
-		s:pline = getline(a:linenum-1)
-		s:pnumtabs = ListGetDepth(s:pline)
-		if s:level < s:pnumtabs
-		" if this is higher level than prev, start a new fold
-			let s:prefix = '>'
-		endif
-	endif
-	return s:prefix.s:level
 endfunction "}}}
 
 
