@@ -1,0 +1,12 @@
+[submodule ".vim/bundle/vim-listfile"]
+	path = .vim/bundle/vim-listfile
+	url = git://github.com/lucasoman/vim-listfile.git
+[submodule ".vim/bundle/vim-mysqltools"]
+	path = .vim/bundle/vim-mysqltools
+	url = git://github.com/lucasoman/vim-mysqltools.git
+[submodule ".vim/bundle/vim-svntools"]
+	path = .vim/bundle/vim-svntools
+	url = git://github.com/lucasoman/vim-svntools.git
+[submodule ".vim/bundle/vim-sessions"]
+	path = .vim/bundle/vim-sessions
+	url = git://github.com/lucasoman/vim-sessions.git
