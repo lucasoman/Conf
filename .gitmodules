@@ -10,3 +10,6 @@
 [submodule ".vim/bundle/vim-sessions"]
 	path = .vim/bundle/vim-sessions
 	url = git://github.com/lucasoman/vim-sessions.git
+[submodule ".vim/bundle/taglist"]
+	path = .vim/bundle/taglist
+	url = git://github.com/vim-scripts/taglist.vim.git
