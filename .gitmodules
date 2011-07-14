@@ -16,3 +16,6 @@
 [submodule ".vim/bundle/NERD_tree"]
 	path = .vim/bundle/NERD_tree
 	url = git://github.com/vim-scripts/The-NERD-tree.git
+[submodule ".vim/bundle/vim-buffergator"]
+	path = .vim/bundle/vim-buffergator
+	url = git://github.com/jeetsukumaran/vim-buffergator.git
