@@ -7,6 +7,8 @@
 " load pathogen
 call pathogen#runtime_append_all_bundles()
 
+"set t_Co=256
+
 " misc options
 " {{{ interface
 " lines, cols in status line
@@ -102,10 +104,6 @@ set ignorecase smartcase
 set visualbell
 
 " show our whitespace
-" alternate character: Â»
-"not a big fan of this; will keep just in case
-"set listchars=tab:\|\ 
-"set listchars=tab:\|Â,trail:Â
 set listchars=tab:\|\ ,trail:.
 "set list
 
