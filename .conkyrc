@@ -17,8 +17,8 @@ ${color yellow}erdos $hr$color
 ${execi 20 top -b -n 1|grep -vP '^(Tasks|Cpu\(s\)):'|head -n 8}
 
 ${color yellow}net $hr$color
-Down: ${downspeed eth1} Up: ${upspeed eth1}
-${downspeedgraph eth1 25,200 0 $color} ${upspeedgraph eth1 25,200 0 $color}
+Down: ${downspeed eth0} Up: ${upspeed eth0}
+${downspeedgraph eth0 25,200 0 $color} ${upspeedgraph eth0 25,200 0 $color}
 
 ${color yellow}linode $hr$color
 ${execi 20 ssh linode 'top -b -n 1|grep -vP "^(Tasks|Cpu\\(s\\)):"|head -n 8'}
