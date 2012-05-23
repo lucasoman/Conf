@@ -59,7 +59,7 @@ set hlsearch
 set nocompatible
 syntax on
 filetype on
-"filetype plugin on
+filetype plugin on
 
 " fast terminal for smoother redrawing
 set ttyfast
@@ -72,7 +72,7 @@ set omnifunc=syntaxcomplete#Complete
 set shiftwidth=2
 set tabstop=2
 "filetype indent on
-set autoindent
+"set autoindent
 set cindent
 
 " show matching enclosing chars for .1 sec
@@ -131,6 +131,7 @@ set switchbuf=useopen
 
 " }}}
 " {{{ colors
+highlight SpecialKey cterm=bold ctermfg=0
 " tabe line colors
 highlight TabLineFill ctermfg=DarkGray
 highlight TabLine ctermfg=4 ctermbg=DarkGray cterm=bold
@@ -151,10 +152,10 @@ highlight Pmenu ctermbg=7 ctermfg=0
 highlight PmenuSel ctermbg=Yellow ctermfg=0
 
 " diff colors
-highlight DiffAdd cterm=none ctermbg=DarkGray
-highlight DiffDelete cterm=none ctermbg=DarkGray
-highlight DiffChange cterm=none ctermbg=none
-highlight DiffText cterm=none ctermbg=DarkGray
+highlight DiffAdd cterm=none ctermbg=4
+highlight DiffDelete cterm=none ctermbg=4
+highlight DiffChange cterm=none ctermbg=4
+highlight DiffText cterm=none ctermbg=4
 
 " keep cursor column last so it overrides all others
 highlight CursorColumn cterm=none ctermbg=Black
@@ -213,6 +214,7 @@ let mapleader = "\\"
 " easier move screen up/down
 nmap <C-j> <C-e>
 nmap <C-k> <C-y>
+nmap <space> za
 " turns off highlighting
 nmap <Leader>/ :nohl<CR>
 " search for highlighted text
@@ -231,6 +233,8 @@ nmap <Leader>l :70vsplit ~/Dropbox/projects.list<CR>
 nmap <Leader>ss :syntax sync fromstart<CR>
 " toggle the tag list
 nmap <Leader>tl :TlistToggle<CR>
+" toggle gundo
+nmap <Leader>gu :GundoToggle<CR>
 " make arrow keys useful
 " use them to swap between split windows
 nmap <left> <C-W>h
@@ -244,7 +248,7 @@ nmap <Leader>ps :!php -l %<CR>
 " run current script
 nmap <Leader>pr :!php % \| less -F<CR>
 " lookup keyword in function reference
-nmap <Leader>ph :!php --rf <cword><CR>
+nmap <Leader>ph :!pman <cword><CR>
 " create test method
 nmap <Leader>pt o<CR>/**<CR>@test<CR>/<CR>public function<TAB>
 " phpdoc comments
@@ -359,6 +363,9 @@ let s:snippets['^\s*while$'] = " () {\<CR>}\<ESC>k^f)i"
 " 3) if word behind cursor contains a slash, try filename complete
 " 4) otherwise, try to ctrl-p complete
 fun! CleverTab()
+	if pumvisible()
+		return "\<C-N>"
+	endif
 	if col('.') > 1
 		let beginning = strpart( getline('.'), 0, col('.')-1 )
 		let words = split(l:beginning,' ')
@@ -378,8 +385,8 @@ fun! CleverTab()
 	elseif (l:thisWord =~ '/')
 		return "\<C-X>\<C-F>"
 	else
-		"return "\<C-X>\<C-O>"
-		return "\<C-P>"
+		return "\<C-X>\<C-O>"
+		"return "\<C-P>"
 	endif
 endfunction
 imap <Tab> <C-R>=CleverTab()<CR>
