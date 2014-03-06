@@ -71,7 +71,7 @@ set omnifunc=syntaxcomplete#Complete
 " Let the filetype plugins do the work.
 set shiftwidth=2
 set tabstop=2
-"filetype indent on
+filetype indent on
 "set autoindent
 set cindent
 
@@ -241,6 +241,10 @@ nmap <left> <C-W>h
 nmap <right> <C-W>l
 nmap <up> <C-W>k
 nmap <down> <C-W>j
+com -range XselCopy :<line1>,<line2>w !xsel -i -b
+com XselPaste :r !xsel -o -b
+vmap <silent> <Leader>xc :XselCopy<CR>
+nmap <silent> <Leader>xp :XselPaste<CR>
 "}}}
 " php {{{
 " syntax check
@@ -281,7 +285,7 @@ endfunction
 nmap <F2> :call ToggleColumns()<CR>
 imap <F2> <C-o>:call ToggleColumns()<CR>
 nmap <F3> :Nload<CR>
-" <F4>
+nmap <F4> :NERDTree<CR>
 set pastetoggle=<F5>
 " <F6>
 nmap <F7> :!updatedev.php %:p<CR>
